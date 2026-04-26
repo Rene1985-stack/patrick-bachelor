@@ -1350,12 +1350,17 @@ function showWarn(msg) {
 async function saveData(newScores, newUploads, newReleased, newOverride, newPublished) {
   if (!db) return;
   try {
+    // Read current to preserve fields we don't manage here (patrickLogins, snoopAttempts)
+    const snap = await getDoc(doc(db, "bachelor", "patrick"));
+    const existing = snap.exists() ? snap.data() : {};
     await setDoc(doc(db, "bachelor", "patrick"), {
       scores: newScores ?? scores,
       uploads: newUploads ?? uploads,
       released: newReleased ?? released,
       goldOverrideUsed: newOverride ?? goldOverrideUsed,
-      scorePublished: newPublished ?? scorePublished
+      scorePublished: newPublished ?? scorePublished,
+      patrickLogins: existing.patrickLogins || patrickLogins || [],
+      snoopAttempts: existing.snoopAttempts || []
     });
     setStatus('✓ Opgeslagen', 'ok');
     setTimeout(() => setStatus(''), 2000);
@@ -2012,7 +2017,17 @@ async function handleFiles(fileList, key, progressBox, progressBar) {
 }
 
 // --- Login Logic ---
+let renderScheduled = false;
 function render() {
+  if (renderScheduled) return;
+  renderScheduled = true;
+  requestAnimationFrame(() => {
+    renderScheduled = false;
+    actualRender();
+  });
+}
+
+function actualRender() {
   const panel = document.querySelector('.stats-panel');
   if (currentRole) {
     panel.classList.add('visible');
