@@ -448,33 +448,18 @@
     background: linear-gradient(135deg, rgba(95, 200, 224, 0.15) 0%, rgba(48, 96, 160, 0.15) 100%);
     border: 1px solid #5fc8e0;
     border-radius: 6px;
-    padding: 0 12px;
+    padding: 10px 12px;
     margin-bottom: 14px;
     color: var(--parchment);
-  }
-  .patje-activity-box.never {
-    padding: 10px 12px;
-    border-color: rgba(255,255,255,0.2);
-    background: rgba(0,0,0,0.2);
-    opacity: 0.7;
-  }
-  .patje-activity-box summary {
-    cursor: pointer;
-    list-style: none;
-    padding: 10px 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
     align-items: center;
   }
-  .patje-activity-box summary::-webkit-details-marker { display: none; }
-  .patje-activity-box summary::before {
-    content: '▶';
-    color: #5fc8e0;
-    font-size: 10px;
-    transition: transform 0.2s;
+  .patje-activity-box.never {
+    border-color: rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.2);
   }
-  .patje-activity-box[open] summary::before { transform: rotate(90deg); }
   .pa-title {
     font-family: 'Press Start 2P', monospace;
     font-size: 9px;
@@ -486,31 +471,6 @@
     color: var(--parchment);
   }
   .pa-summary b { color: white; }
-  .pa-body {
-    font-size: 13px;
-    color: var(--parchment-2);
-    font-style: italic;
-    margin-top: 4px;
-  }
-  .pa-history {
-    border-top: 1px solid rgba(95, 200, 224, 0.3);
-    padding: 10px 0 12px;
-    font-size: 12px;
-  }
-  .pa-history-title {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 8px;
-    color: #5fc8e0;
-    letter-spacing: 0.1em;
-    margin-bottom: 6px;
-  }
-  .pa-entry {
-    padding: 3px 8px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 3px;
-    margin-bottom: 3px;
-    font-family: 'Cormorant Garamond', serif;
-  }
 
   .snoop-warning {
     margin-top: 12px;
@@ -1505,27 +1465,20 @@ function formatTime(ms) {
 function renderPatjeActivity() {
   const el = document.getElementById('patje-activity');
   if (!el) return;
-  if (patrickLogins.length === 0) {
+  if (!patrickLogins || patrickLogins.length === 0) {
     el.innerHTML = `
       <div class="patje-activity-box never">
-        <div class="pa-title">👁 PATJE STATUS</div>
-        <div class="pa-body">Nog niet ingelogd</div>
+        <span class="pa-title">👁 PATJE STATUS</span>
+        <span class="pa-summary" style="opacity:0.7;">Nog niet ingelogd</span>
       </div>`;
     return;
   }
   const last = patrickLogins[patrickLogins.length - 1];
-  const recent = patrickLogins.slice(-10).reverse();
   el.innerHTML = `
-    <details class="patje-activity-box">
-      <summary>
-        <span class="pa-title">👁 PATJE STATUS</span>
-        <span class="pa-summary">Laatst gezien: <b>${relativeTime(last)}</b> · ${patrickLogins.length} login${patrickLogins.length > 1 ? 's' : ''}</span>
-      </summary>
-      <div class="pa-history">
-        <div class="pa-history-title">Recente logins:</div>
-        ${recent.map(t => `<div class="pa-entry">⏱ ${formatTime(t)}</div>`).join('')}
-      </div>
-    </details>`;
+    <div class="patje-activity-box">
+      <span class="pa-title">👁 PATJE STATUS</span>
+      <span class="pa-summary">Laatst gezien: <b>${relativeTime(last)}</b> · ${patrickLogins.length} login${patrickLogins.length > 1 ? 's' : ''}</span>
+    </div>`;
 }
 
 function setStatus(msg, type) {
@@ -2018,6 +1971,7 @@ async function handleFiles(fileList, key, progressBox, progressBar) {
 
 // --- Login Logic ---
 let renderScheduled = false;
+let renderCount = 0;
 function render() {
   if (renderScheduled) return;
   renderScheduled = true;
@@ -2028,17 +1982,23 @@ function render() {
 }
 
 function actualRender() {
-  const panel = document.querySelector('.stats-panel');
-  if (currentRole) {
-    panel.classList.add('visible');
-  } else {
-    panel.classList.remove('visible');
-  }
-  renderCard();
-  if (currentRole === 'crew') {
-    renderCrewPanel();
-  } else if (currentRole === 'patrick') {
-    renderPatrickPanel();
+  renderCount++;
+  if (renderCount % 10 === 0) console.log('[render]', renderCount, 'renders so far');
+  try {
+    const panel = document.querySelector('.stats-panel');
+    if (currentRole) {
+      panel.classList.add('visible');
+    } else {
+      panel.classList.remove('visible');
+    }
+    renderCard();
+    if (currentRole === 'crew') {
+      renderCrewPanel();
+    } else if (currentRole === 'patrick') {
+      renderPatrickPanel();
+    }
+  } catch (e) {
+    console.error('[render error]', e);
   }
 }
 
