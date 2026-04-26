@@ -175,7 +175,7 @@
     box-shadow: 0 2px 0 var(--gold-deep);
   }
   .stats-grid { display: flex; flex-direction: column; gap: 8px; }
- 
+
   .attr-row {
     display: grid;
     grid-template-columns: 44px 1fr auto;
@@ -252,7 +252,7 @@
   .sparkle { position: absolute; z-index: 8; color: var(--gold);
     animation: sparkle 2s ease-in-out infinite; pointer-events: none;
     text-shadow: 0 0 6px white; }
- 
+
   /* === LOGIN & PANELS === */
   .panel {
     width: 100%; max-width: 500px;
@@ -408,7 +408,7 @@
     text-align: center; font-size: 13px;
   }
   .config-warn code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; }
- 
+
   .snoop-warning {
     margin-top: 12px;
     padding: 10px 14px;
@@ -435,7 +435,7 @@
     25% { transform: translateY(0) translateX(-4px); }
     75% { transform: translateY(0) translateX(4px); }
   }
- 
+
   /* === PATRICK VIEW === */
   .patrick-quest {
     background: linear-gradient(180deg, rgba(255, 216, 74, 0.15) 0%, rgba(255, 122, 26, 0.1) 100%);
@@ -445,6 +445,35 @@
     margin-bottom: 14px;
     position: relative;
     box-shadow: 0 0 30px rgba(255, 216, 74, 0.2);
+  }
+  .patrick-quest.completed {
+    background: linear-gradient(180deg, rgba(152, 232, 88, 0.18) 0%, rgba(76, 168, 76, 0.12) 100%);
+    border-color: var(--green);
+    box-shadow: 0 0 25px rgba(152, 232, 88, 0.25);
+    opacity: 0.92;
+  }
+  .patrick-quest.completed .quest-tag {
+    background: var(--green);
+    color: var(--night);
+    box-shadow: 0 2px 0 #5fa838;
+  }
+  .patrick-quest.completed .quest-key,
+  .patrick-quest.completed .quest-from {
+    color: var(--green);
+  }
+  .completed-stamp {
+    position: absolute;
+    top: -16px; right: 16px;
+    width: 44px; height: 44px;
+    background: var(--green);
+    color: white;
+    border: 3px solid #1a1410;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: bold;
+    box-shadow: 0 4px 0 #2c5824, 0 0 20px rgba(152, 232, 88, 0.6);
+    transform: rotate(8deg);
+    z-index: 5;
   }
   .quest-tag {
     position: absolute; top: -12px; left: 18px;
@@ -516,7 +545,7 @@
   }
   .quest-status.uploaded .lbl { color: var(--sheikah-orange); }
   .quest-status.scored .lbl { color: var(--green); }
- 
+
   .upload-zone {
     margin-top: 12px;
     border: 2px dashed var(--gold);
@@ -538,12 +567,12 @@
     display: block; margin-top: 6px;
   }
   .upload-zone input[type="file"] { display: none; }
- 
+
   .upload-progress {
     margin-top: 10px; height: 6px; background: rgba(0,0,0,0.3); border-radius: 3px; overflow: hidden;
   }
   .upload-progress .bar { height: 100%; background: var(--gold); width: 0; transition: width 0.2s; }
- 
+
   .uploaded-files {
     margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;
   }
@@ -609,7 +638,7 @@
     background: #e84838;
     transform: scale(1.1);
   }
- 
+
   .progress-bar {
     background: rgba(0,0,0,0.3); border: 1px solid var(--gold);
     border-radius: 6px; height: 24px; position: relative; overflow: hidden;
@@ -639,7 +668,7 @@
     top: -18px; left: 50%; transform: translateX(-50%);
     font-size: 14px;
   }
- 
+
   .gold-override-btn {
     width: 100%;
     padding: 14px;
@@ -694,7 +723,7 @@
     letter-spacing: 0.15em;
     text-shadow: 0 0 8px rgba(255, 216, 74, 0.6);
   }
- 
+
   .urgency-banner {
     background: linear-gradient(135deg, #8b1e1e 0%, #c4302b 50%, #8b1e1e 100%);
     border: 3px solid #ffd84a;
@@ -735,7 +764,7 @@
     text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
   }
   .urgency-body b { color: var(--gold); font-size: 16px; }
- 
+
   /* === CELEBRATION === */
   .champion-frame.celebrating {
     animation: celebration-pulse 1.5s ease-in-out infinite !important;
@@ -779,24 +808,24 @@
     20% { opacity: 1; }
     100% { opacity: 0; }
   }
- 
+
   .no-quest {
     text-align: center; padding: 30px 20px;
     color: var(--parchment-2); font-style: italic;
   }
   .no-quest h3 { font-family: 'MedievalSharp', cursive; color: var(--gold); font-size: 18px; margin-bottom: 6px; }
- 
+
   @media (max-width: 500px) {
     .score-row { grid-template-columns: 40px 1fr 60px 50px; gap: 4px; font-size: 11px; }
   }
 </style>
 </head>
 <body>
- 
+
 <div id="config-warn" class="config-warn" style="display:none;">
   ⚠️ Firebase niet geconfigureerd of fout
 </div>
- 
+
 <!-- ========== ZELDA CARD ========== -->
 <!-- ========== CHAMPION FRAME (kaart + abilities geïntegreerd) ========== -->
 <div class="champion-frame">
@@ -805,7 +834,7 @@
   <div class="sun"></div>
   <div class="cloud c1"></div>
   <div class="cloud c2"></div>
- 
+
   <svg class="sky-triforce" viewBox="0 0 50 44">
     <g stroke="#8a5a10" stroke-width="1.5">
       <polygon points="25,2 14,22 36,22" fill="#ffe870"/>
@@ -813,24 +842,24 @@
       <polygon points="36,23 25,43 47,43" fill="#ffd84a"/>
     </g>
   </svg>
- 
+
   <div class="mountains">
     <div class="mountain m1"></div>
     <div class="mountain m2"></div>
     <div class="mountain m3"></div>
   </div>
- 
+
   <div class="tree t1"><div class="tree-leaves"></div><div class="tree-trunk"></div></div>
   <div class="tree t2"><div class="tree-leaves"></div><div class="tree-trunk"></div></div>
   <div class="tree t3"><div class="tree-leaves"></div><div class="tree-trunk"></div></div>
- 
+
   <div class="grass-fg"></div>
- 
+
   <div class="sparkle" style="top: 36%; left: 14%; font-size: 14px;">✦</div>
   <div class="sparkle" style="top: 42%; right: 12%; font-size: 18px; animation-delay: 0.5s;">✧</div>
   <div class="sparkle" style="top: 30%; right: 22%; font-size: 12px; animation-delay: 1s;">✦</div>
   <div class="sparkle" style="top: 50%; left: 10%; font-size: 16px; animation-delay: 1.5s;">✧</div>
- 
+
   <svg class="character" id="character-svg" viewBox="0 0 230 300" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="tunicGrad" x1="0" x2="0" y1="0" y2="1">
@@ -907,19 +936,19 @@
     <ellipse cx="140" cy="74" rx="4" ry="3" fill="#e8a888" opacity="0.5"/>
   </svg>
   <div class="pose-label" id="pose-label"></div>
- 
+
   <div class="hud hearts" id="hearts"></div>
   <div class="hud stamina" id="stamina"></div>
   <div class="date-stamp">★ QUEST LOG ★</div>
- 
+
   <div class="banner">
     <div class="banner-title">CHAMPION</div>
     <div class="banner-name">PATRICK</div>
   </div>
- 
+
   <div class="epithet-box">⚔ Held van Hobbelrade ⚔</div>
 </div>
- 
+
 <!-- ========== ABILITIES (geïntegreerd in champion-frame) ========== -->
 <div class="stats-panel">
   <div class="stats-header">
@@ -930,7 +959,7 @@
 </div>
 </div>
 <!-- /champion-frame -->
- 
+
 <!-- ========== LOGIN ========== -->
 <div class="panel" id="login-panel">
   <div class="login-box">
@@ -942,7 +971,7 @@
     Crew of Patrick? Voer je PIN in.
   </div>
 </div>
- 
+
 <!-- ========== CREW PANEL ========== -->
 <div class="panel" id="crew-panel" style="display:none;">
   <div class="panel-header">
@@ -952,7 +981,7 @@
     </div>
   </div>
   <div id="crew-identity" style="font-size: 12px; color: var(--parchment-2); margin-bottom: 10px; font-style: italic;"></div>
- 
+
   <div id="crew-total-progress" style="margin-bottom: 14px;">
     <div style="font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--gold); margin-bottom: 6px; letter-spacing: 0.1em;">
       ★ TOTAAL VERLOOP ★
@@ -966,9 +995,9 @@
       Drempel <b style="color: var(--gold);">2100</b> punten van 2600 voor een stripper. Weekend opdrachten tellen 3×.
     </div>
   </div>
- 
+
   <div id="crew-override" style="margin-bottom: 14px;"></div>
- 
+
   <div class="info">René en Niels geven opdrachten vrij. Iedereen scoort 0–100. Klik op uploads om bewijs te bekijken.</div>
   <div id="score-list"></div>
   <div class="status" id="crew-status"></div>
@@ -976,16 +1005,16 @@
     <b>Workflow:</b> 1) <b>René of Niels</b> klikt <b>👁 Zichtbaar voor Patrick</b> → opdracht verschijnt in zijn quest log. 2) Patrick uploadt bewijs. 3) <b>Iedere crew member</b> geeft een score (0–100). Het gemiddelde komt op de kaart. PIN crew: <b>2305</b> · PIN Patrick: <b>PATJE</b>.
   </div>
 </div>
- 
+
 <!-- ========== PATRICK PANEL ========== -->
 <div class="panel" id="patrick-panel" style="display:none;">
   <div class="panel-header">
     <span>⚔ PATJE · QUEST LOG</span>
     <button class="btn-small" id="lock-btn-patrick">✕ Logout</button>
   </div>
- 
+
   <div id="patrick-banner"></div>
- 
+
   <div style="margin-bottom: 14px;">
     <div style="font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--gold); margin-bottom: 8px; letter-spacing: 0.1em; text-align: center;">
       ★ JOUW VERLOOP ★
@@ -998,14 +1027,14 @@
       Hoe meer punten, hoe meer er ontgrendeld wordt op het moment suprême 🔥
     </div>
   </div>
- 
+
   <div id="patrick-quests"></div>
   <div id="patrick-banner-bottom"></div>
   <div class="status" id="patrick-status"></div>
 </div>
- 
+
 <div class="tagline" id="tagline">Deel deze link met de crew. Patrick krijgt een eigen PIN.</div>
- 
+
 <!-- Modal for viewing uploads -->
 <div id="upload-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center; padding:20px;">
   <div style="position:relative; max-width:90vw; max-height:90vh;">
@@ -1013,11 +1042,11 @@
     <div id="modal-content"></div>
   </div>
 </div>
- 
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
- 
+
 const firebaseConfig = {
   apiKey: "AIzaSyCNp9TOpqSUhL0t2y5qBpw1tWoHcOrX56M",
   authDomain: "patrick-bachelor.firebaseapp.com",
@@ -1027,15 +1056,15 @@ const firebaseConfig = {
   appId: "1:112446848886:web:f1818b3ce9c762dc838457",
   measurementId: "G-YQJR5RKEPD"
 };
- 
+
 // === CLOUDINARY voor foto/video uploads (gratis, vervangt Firebase Storage) ===
 // Vul in na aanmaken Cloudinary account (zie instructies):
 const CLOUDINARY_CLOUD_NAME = "djlb696ab";
 const CLOUDINARY_UPLOAD_PRESET = "patrick_bachelor";
- 
+
 const CREW_PIN = "2305";
 const PATRICK_PIN = "PATJE";
- 
+
 const CREW_MEMBERS = [
   { id: 'rene',   name: 'René' },
   { id: 'pieter', name: 'Pieter' },
@@ -1049,17 +1078,17 @@ const CREW_MEMBERS = [
   { id: 'dennis', name: 'Dennis' },
   { id: 'niels',  name: 'Niels' },
 ];
- 
+
 // Alleen deze crew members kunnen opdrachten zichtbaar/verborgen schakelen voor Patrick
 const ADMIN_IDS = ['rene', 'niels'];
- 
+
 // René en Niels kunnen de Gold Override aan/uit zetten
 const OVERRIDE_CREW_IDS = ['rene', 'niels'];
- 
+
 const STRIPPER_THRESHOLD = 2100;
 const OVERRIDE_POINTS = 2101;
 const MAX_UPLOAD_BYTES = 100 * 1024 * 1024; // 100 MB Cloudinary free tier limit
- 
+
 // 5 character attributen (RPG stijl) gebaseerd op opdracht-groepen
 const ATTRIBUTES = [
   { id: 'warrior',  name: 'WARRIOR',  icon: '🛡', keys: ['SHO', 'BRV', 'HIK'],        desc: 'Kracht & moed' },
@@ -1068,7 +1097,7 @@ const ATTRIBUTES = [
   { id: 'bard',     name: 'BARD',     icon: '🎤', keys: ['VOC', 'SNG', 'MJ', 'DUR'],  desc: 'Performance' },
   { id: 'diplomat', name: 'DIPLOMAT', icon: '❤️', keys: ['FAM', 'SQD', 'SWG'],        desc: 'Charme & netwerk' },
 ];
- 
+
 // Get attribute score: average of published averages of relevant opdrachten that are visible
 function getAttributeScore(attr, visibleOpdrachten) {
   const relevantOps = visibleOpdrachten.filter(o => attr.keys.includes(o.key));
@@ -1077,12 +1106,12 @@ function getAttributeScore(attr, visibleOpdrachten) {
   const total = scored.reduce((s, o) => s + getPublishedAverage(o.key), 0);
   return Math.round(total / scored.length);
 }
- 
+
 // Weekend opdrachten tellen 3x
 function getMultiplier(opdracht) {
   return opdracht.section === 'weekend' ? 3 : 1;
 }
- 
+
 // Pre-feest opdrachten + Bachelor weekend
 const OPDRACHTEN = [
   // === Pre-feest ===
@@ -1120,7 +1149,7 @@ const OPDRACHTEN = [
   { key: 'RNG', name: 'Crew',   date: '23 mei', dateObj: '2026-05-23', task: '💍 Ring Challenge', attribute: 'Precisie', section: 'weekend',
     message: 'Ring Challenge — uitleg volgt op de dag zelf.' },
 ];
- 
+
 let scores = {};
 let uploads = {};
 let released = {};
@@ -1129,7 +1158,7 @@ let goldOverrideUsed = false;
 let db = null;
 let currentRole = null; // 'crew' | 'patrick' | null
 let currentCrewId = localStorage.getItem('crewId') || null;
- 
+
 // --- Score helpers (handle both old number format and new {id: score} object format) ---
 function scoreValuesArray(opScores) {
   if (opScores == null) return [];
@@ -1154,7 +1183,7 @@ function getMyScore(key) {
 function getVoteCount(key) {
   return scoreValuesArray(scores[key]).length;
 }
- 
+
 // --- Init Firebase ---
 try {
   const app = initializeApp(firebaseConfig);
@@ -1178,13 +1207,13 @@ try {
 } catch (e) {
   showWarn('Firebase fout: ' + e.message);
 }
- 
+
 function showWarn(msg) {
   const w = document.getElementById('config-warn');
   w.style.display = 'block';
   w.textContent = '⚠️ ' + msg;
 }
- 
+
 async function saveData(newScores, newUploads, newReleased, newOverride, newPublished) {
   if (!db) return;
   try {
@@ -1201,7 +1230,7 @@ async function saveData(newScores, newUploads, newReleased, newOverride, newPubl
     setStatus('✗ Opslaan mislukt: ' + e.message, 'err');
   }
 }
- 
+
 async function togglePublished(key) {
   if (!ADMIN_IDS.includes(currentCrewId)) {
     setStatus('Alleen René en Niels kunnen scores vrijgeven', 'err');
@@ -1213,7 +1242,7 @@ async function togglePublished(key) {
   scorePublished = newPublished;
   await saveData(scores, uploads, released, goldOverrideUsed, newPublished);
 }
- 
+
 async function useGoldOverride() {
   if (!OVERRIDE_CREW_IDS.includes(currentCrewId)) {
     setStatus('Alleen René of Niels kan de Gold Override gebruiken', 'err');
@@ -1223,7 +1252,7 @@ async function useGoldOverride() {
   goldOverrideUsed = !goldOverrideUsed;
   await saveData(scores, uploads, released, goldOverrideUsed);
 }
- 
+
 // Calculate earned and max with multipliers + override
 function calcEarned(opdrachten) {
   const base = opdrachten
@@ -1234,7 +1263,7 @@ function calcEarned(opdrachten) {
 function calcMax(opdrachten) {
   return opdrachten.reduce((s, o) => s + 100 * getMultiplier(o), 0);
 }
- 
+
 async function saveMyScore(key, value) {
   if (!currentCrewId) return;
   const newScores = { ...scores };
@@ -1253,7 +1282,7 @@ async function saveMyScore(key, value) {
   scores = newScores;
   await saveData(newScores, uploads, released);
 }
- 
+
 async function toggleRelease(key) {
   if (!ADMIN_IDS.includes(currentCrewId)) {
     setStatus('Alleen René en Niels kunnen opdrachten zichtbaar maken', 'err');
@@ -1265,7 +1294,7 @@ async function toggleRelease(key) {
   released = newReleased;
   await saveData(scores, uploads, newReleased);
 }
- 
+
 async function removeUpload(opdrachtKey, uploadIndex) {
   if (!confirm('Deze upload verwijderen?')) return;
   const newUploads = { ...uploads };
@@ -1276,7 +1305,7 @@ async function removeUpload(opdrachtKey, uploadIndex) {
   uploads = newUploads;
   await saveData(scores, newUploads, released, goldOverrideUsed);
 }
- 
+
 async function uploadFile(file, opdrachtKey, progressEl) {
   if (CLOUDINARY_CLOUD_NAME === "PASTE_HIER_CLOUD_NAME") {
     throw new Error('Cloudinary niet geconfigureerd');
@@ -1284,11 +1313,11 @@ async function uploadFile(file, opdrachtKey, progressEl) {
   const isImage = file.type.startsWith('image/');
   const resourceType = isImage ? 'image' : 'video';
   const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`;
- 
+
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
- 
+
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', url);
@@ -1317,7 +1346,7 @@ async function uploadFile(file, opdrachtKey, progressEl) {
     xhr.send(formData);
   });
 }
- 
+
 function setStatus(msg, type) {
   const id = currentRole === 'crew' ? 'crew-status' : 'patrick-status';
   const el = document.getElementById(id);
@@ -1326,25 +1355,25 @@ function setStatus(msg, type) {
     el.className = 'status ' + (type || '');
   }
 }
- 
+
 let celebrationFired = false;
 function triggerCelebration() {
   // Permanent: champion frame glows extra
   const frame = document.querySelector('.champion-frame');
   if (frame) frame.classList.add('celebrating');
- 
+
   // One-shot: confetti + flash op het moment van overschrijden
   const seen = sessionStorage.getItem('celebrated2100');
   if (seen || celebrationFired) return;
   celebrationFired = true;
   sessionStorage.setItem('celebrated2100', '1');
- 
+
   // Flash
   const flash = document.createElement('div');
   flash.className = 'victory-flash';
   document.body.appendChild(flash);
   setTimeout(() => flash.remove(), 1300);
- 
+
   // Confetti shower
   const container = document.createElement('div');
   container.className = 'confetti-container';
@@ -1363,19 +1392,19 @@ function triggerCelebration() {
   }
   setTimeout(() => container.remove(), 5500);
 }
- 
+
 // --- Release helpers ---
 function isReleased(opdracht) {
   return released[opdracht.key] === true;
 }
- 
+
 // --- Render Card (always) ---
 function renderCard() {
   // Patrick en pre-login zien alleen released opdrachten. Crew ziet alles.
   const visibleOpdrachten = currentRole === 'crew'
     ? OPDRACHTEN
     : OPDRACHTEN.filter(o => isReleased(o));
- 
+
   const completed = visibleOpdrachten.filter(o => getAverage(o.key) != null);
   const earnedTotal = calcEarned(visibleOpdrachten);
   const maxTotal = calcMax(visibleOpdrachten);
@@ -1388,16 +1417,16 @@ function renderCard() {
     ? Math.max(0, 5 - Math.round((completed.length / totalVisible) * 5))
     : 5;
   const stamPct = totalVisible > 0 ? (completed.length / totalVisible) * 100 : 0;
- 
+
   document.getElementById('ovr-badge').textContent = 'LV ' + (ovr || '??');
- 
+
   const heartsEl = document.getElementById('hearts');
   heartsEl.innerHTML = '';
   for (let i = 0; i < 5; i++) {
     const filled = i < heartCount;
     heartsEl.innerHTML += `<svg class="heart" viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9c-1-2.5 0-6 3.5-6.5 2-0.3 4 0.7 5.5 2.5 1.5-1.8 3.5-2.8 5.5-2.5C20 6 21 9.5 20 12c-2 4.5-9 9-9 9z" fill="${filled ? '#e84838' : 'rgba(255,255,255,0.2)'}" stroke="#1a1410" stroke-width="1.5"/></svg>`;
   }
- 
+
   const dash = (stamPct / 100) * 81.6;
   document.getElementById('stamina').innerHTML = `
     <svg viewBox="0 0 40 40">
@@ -1407,15 +1436,15 @@ function renderCard() {
       <circle cx="20" cy="20" r="5" fill="#98e858" stroke="#1a1410" stroke-width="1.5"/>
       <text x="20" y="24" text-anchor="middle" font-size="9" font-weight="bold" fill="#1a1410" font-family="'Press Start 2P', monospace">${completed.length}</text>
     </svg>`;
- 
+
   const grid = document.getElementById('stats-grid');
   grid.innerHTML = '';
- 
+
   if (visibleOpdrachten.length === 0) {
     grid.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--parchment-2); font-style: italic;">Nog niks om te zien…</div>`;
     return;
   }
- 
+
   ATTRIBUTES.forEach(attr => {
     const score = getAttributeScore(attr, visibleOpdrachten);
     const has = score != null;
@@ -1432,7 +1461,7 @@ function renderCard() {
       </div>`;
   });
 }
- 
+
 // --- Render Crew Score Panel ---
 function renderCrewPanel() {
   // Total progress with multipliers
@@ -1441,7 +1470,7 @@ function renderCrewPanel() {
   const pct = (earned / max) * 100;
   document.getElementById('crew-progress-fill').style.width = Math.min(100, pct) + '%';
   document.getElementById('crew-progress-label').textContent = `${earned} / ${max} punten (drempel ${STRIPPER_THRESHOLD})`;
- 
+
   // Override toggle voor René en Niels
   const overrideBox = document.getElementById('crew-override');
   if (overrideBox) {
@@ -1456,7 +1485,7 @@ function renderCrewPanel() {
         : '';
     }
   }
- 
+
   const list = document.getElementById('score-list');
   list.innerHTML = '';
   let lastSection = null;
@@ -1514,7 +1543,7 @@ function renderCrewPanel() {
     `;
     list.appendChild(row);
   });
- 
+
   list.querySelectorAll('input.score').forEach(input => {
     input.addEventListener('blur', (e) => {
       const k = e.target.dataset.key;
@@ -1542,7 +1571,7 @@ function renderCrewPanel() {
     });
   });
 }
- 
+
 function renderUploadPreview(u, key, idx, clickable) {
   const isImg = u.type && u.type.startsWith('image/');
   const isVid = u.type && u.type.startsWith('video/');
@@ -1554,7 +1583,7 @@ function renderUploadPreview(u, key, idx, clickable) {
   }
   return `<a href="${u.url}" target="_blank" class="file-link">📄 ${u.name}</a>`;
 }
- 
+
 function openModal(url, type) {
   const modal = document.getElementById('upload-modal');
   const content = document.getElementById('modal-content');
@@ -1565,7 +1594,7 @@ function openModal(url, type) {
   }
   modal.style.display = 'flex';
 }
- 
+
 document.getElementById('modal-close').addEventListener('click', () => {
   document.getElementById('upload-modal').style.display = 'none';
   document.getElementById('modal-content').innerHTML = '';
@@ -1576,7 +1605,7 @@ document.getElementById('upload-modal').addEventListener('click', (e) => {
     document.getElementById('modal-content').innerHTML = '';
   }
 });
- 
+
 // --- Render Patrick Panel ---
 function renderPatrickPanel() {
   // Patrick ziet alleen released opdrachten
@@ -1587,7 +1616,7 @@ function renderPatrickPanel() {
   const pct = max > 0 ? Math.min(100, (earned / max) * 100) : 0;
   document.getElementById('patrick-progress-fill').style.width = pct + '%';
   document.getElementById('patrick-progress-label').textContent = max > 0 ? `${earned} / ${max} punten` : 'Nog geen opdrachten';
- 
+
   // Motiverende banner — switcht van push naar viering bij 2100
   const bannerEl = document.getElementById('patrick-banner');
   if (earned >= STRIPPER_THRESHOLD) {
@@ -1612,16 +1641,20 @@ function renderPatrickPanel() {
         </div>
       </div>`;
   }
- 
+
   const container = document.getElementById('patrick-quests');
   container.innerHTML = '';
- 
-  // Active quests: released + not yet published
-  const activeQuests = OPDRACHTEN.filter(o => isReleased(o) && getPublishedAverage(o.key) == null);
-  const uploadedNotScored = activeQuests.filter(o => uploads[o.key] && uploads[o.key].length > 0);
+
+  // All released quests
+  const releasedQuests = OPDRACHTEN.filter(o => isReleased(o));
+  // Active = released + not yet published (still being judged or no upload yet)
+  const activeQuests = releasedQuests.filter(o => getPublishedAverage(o.key) == null);
+  const completedQuests = releasedQuests.filter(o => getPublishedAverage(o.key) != null);
+
   const noUpload = activeQuests.filter(o => !uploads[o.key] || uploads[o.key].length === 0);
- 
-  if (activeQuests.length === 0) {
+  const uploadedNotScored = activeQuests.filter(o => uploads[o.key] && uploads[o.key].length > 0);
+
+  if (releasedQuests.length === 0) {
     container.innerHTML = `
       <div class="no-quest">
         <h3>Geen actieve opdracht</h3>
@@ -1629,17 +1662,18 @@ function renderPatrickPanel() {
       </div>`;
     return;
   }
- 
-  // Render no-upload first
+
+  // Order: no-upload (action needed) → uploaded (waiting) → completed (done)
   noUpload.forEach(o => container.appendChild(buildQuestCard(o, 'todo')));
   uploadedNotScored.forEach(o => container.appendChild(buildQuestCard(o, 'uploaded')));
+  completedQuests.forEach(o => container.appendChild(buildQuestCard(o, 'completed')));
 }
- 
+
 function buildQuestCard(o, state) {
   const div = document.createElement('div');
-  div.className = 'patrick-quest';
+  div.className = 'patrick-quest' + (state === 'completed' ? ' completed' : '');
   const opUploads = uploads[o.key] || [];
- 
+
   let statusHtml = '';
   if (state === 'todo') {
     statusHtml = `
@@ -1653,9 +1687,19 @@ function buildQuestCard(o, state) {
         <span class="lbl">⏳ INGELEVERD</span>
         Bewijs ontvangen. De crew bekijkt en beoordeelt 'm. Je kunt nog meer toevoegen.
       </div>`;
+  } else if (state === 'completed') {
+    const score = getPublishedAverage(o.key);
+    statusHtml = `
+      <div class="quest-status scored">
+        <span class="lbl">✓ AFGEROND</span>
+        Score: <b style="color:white; font-size:16px;">${score}</b> / 100${o.section === 'weekend' ? ` <span style="opacity:0.7;">(×3 = ${score*3} punten)</span>` : ''}
+      </div>`;
   }
- 
+
+  const completedTag = state === 'completed' ? '<div class="completed-stamp">✓</div>' : '';
+
   div.innerHTML = `
+    ${completedTag}
     <div class="quest-tag">${o.section === 'pre' ? 'OPDRACHT' : 'FINALE'} · ${o.attribute}</div>
     <div class="quest-key">${o.key}</div>
     <div class="quest-from">📩 OPDRACHTGEVER: <b>${o.name}</b></div>
@@ -1675,11 +1719,13 @@ function buildQuestCard(o, state) {
             if (isImg) inner = `<img src="${u.url}"/>`;
             else if (isVid) inner = `<video src="${u.url}" muted></video>`;
             else inner = `<div class="file-icon">📄</div>`;
-            return `<div class="preview">${inner}<button class="del-upload" data-del-key="${o.key}" data-del-idx="${idx}" title="Verwijder">✕</button></div>`;
+            const delBtn = state === 'completed' ? '' : `<button class="del-upload" data-del-key="${o.key}" data-del-idx="${idx}" title="Verwijder">✕</button>`;
+            return `<div class="preview">${inner}${delBtn}</div>`;
           }).join('')}
         </div>
       </div>
     ` : ''}
+    ${state !== 'completed' ? `
     <div class="upload-zone" data-key="${o.key}">
       <input type="file" accept="image/*,video/*" multiple/>
       <p>📤 UPLOAD BEWIJS</p>
@@ -1701,32 +1747,35 @@ function buildQuestCard(o, state) {
         <p style="color: var(--gold); font-weight: bold;">⚠️ Bestanden groter dan 100 MB worden geweigerd.</p>
       </div>
     </details>
+    ` : ''}
   `;
- 
-  // Hook up upload zone
+
+  // Hook up upload zone (only if not completed)
   const zone = div.querySelector('.upload-zone');
-  const input = zone.querySelector('input[type=file]');
-  const progressBox = zone.querySelector('.upload-progress');
-  const progressBar = progressBox.querySelector('.bar');
- 
-  zone.addEventListener('click', (e) => {
-    if (e.target.tagName !== 'INPUT') input.click();
-  });
-  zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
-  zone.addEventListener('drop', async (e) => {
-    e.preventDefault();
-    zone.classList.remove('drag');
-    if (e.dataTransfer.files.length) {
-      await handleFiles(e.dataTransfer.files, o.key, progressBox, progressBar);
-    }
-  });
-  input.addEventListener('change', async (e) => {
-    if (e.target.files.length) {
-      await handleFiles(e.target.files, o.key, progressBox, progressBar);
-    }
-  });
- 
+  if (zone) {
+    const input = zone.querySelector('input[type=file]');
+    const progressBox = zone.querySelector('.upload-progress');
+    const progressBar = progressBox.querySelector('.bar');
+
+    zone.addEventListener('click', (e) => {
+      if (e.target.tagName !== 'INPUT') input.click();
+    });
+    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+    zone.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      zone.classList.remove('drag');
+      if (e.dataTransfer.files.length) {
+        await handleFiles(e.dataTransfer.files, o.key, progressBox, progressBar);
+      }
+    });
+    input.addEventListener('change', async (e) => {
+      if (e.target.files.length) {
+        await handleFiles(e.target.files, o.key, progressBox, progressBar);
+      }
+    });
+  }
+
   // Hook up delete buttons on uploads
   div.querySelectorAll('[data-del-key]').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -1736,10 +1785,10 @@ function buildQuestCard(o, state) {
       removeUpload(k, idx);
     });
   });
- 
+
   return div;
 }
- 
+
 async function handleFiles(fileList, key, progressBox, progressBar) {
   // Check file sizes first
   const tooBig = [];
@@ -1778,7 +1827,7 @@ async function handleFiles(fileList, key, progressBox, progressBar) {
   setStatus('✓ Geüpload', 'ok');
   setTimeout(() => setStatus(''), 2000);
 }
- 
+
 // --- Login Logic ---
 function render() {
   const panel = document.querySelector('.stats-panel');
@@ -1794,13 +1843,13 @@ function render() {
     renderPatrickPanel();
   }
 }
- 
+
 document.getElementById('lock-btn-crew').addEventListener('click', logout);
 document.getElementById('lock-btn-patrick').addEventListener('click', logout);
- 
+
 // Initial bind
 resetLoginPanel();
- 
+
 function tryLogin() {
   const input = document.getElementById('pin-input');
   const val = input.value.trim().toUpperCase();
@@ -1828,7 +1877,7 @@ function tryLogin() {
     logSnoopAttempt(val);
   }
 }
- 
+
 function showSnoopWarning() {
   const taunts = [
     "👀 Niet zo nieuwsgierig, Patje. Jouw PIN is PATJE.",
@@ -1852,7 +1901,7 @@ function showSnoopWarning() {
   clearTimeout(warn._timer);
   warn._timer = setTimeout(() => warn.classList.remove('show'), 6000);
 }
- 
+
 async function logSnoopAttempt(attempt) {
   if (!db) return;
   try {
@@ -1871,7 +1920,7 @@ async function logSnoopAttempt(attempt) {
     });
   } catch (e) { /* stil falen */ }
 }
- 
+
 function showCrewIdentitySelector() {
   const panel = document.getElementById('login-panel');
   panel.innerHTML = `
@@ -1895,7 +1944,7 @@ function showCrewIdentitySelector() {
     enterCrewMode();
   });
 }
- 
+
 function enterCrewMode() {
   // Restore login panel HTML in case it was replaced
   resetLoginPanel();
@@ -1915,7 +1964,7 @@ function enterCrewMode() {
   document.getElementById('tagline').textContent = 'Crew mode. Score vrijuit. Patrick logt in met zijn eigen PIN.';
   render();
 }
- 
+
 function resetLoginPanel() {
   const panel = document.getElementById('login-panel');
   panel.innerHTML = `
@@ -1933,7 +1982,7 @@ function resetLoginPanel() {
     if (e.key === 'Enter') tryLogin();
   });
 }
- 
+
 function logout() {
   currentRole = null;
   resetLoginPanel();
@@ -1943,10 +1992,9 @@ function logout() {
   document.getElementById('tagline').textContent = 'Deel deze link met de crew. Patrick krijgt een eigen PIN.';
   render();
 }
- 
+
 render();
 </script>
- 
+
 </body>
 </html>
- 
