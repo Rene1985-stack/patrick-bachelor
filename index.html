@@ -409,6 +409,41 @@
   }
   .config-warn code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; }
 
+  .concept-explainer {
+    background: linear-gradient(180deg, rgba(255, 216, 74, 0.12) 0%, rgba(0,0,0,0.3) 100%);
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    padding: 0 14px;
+    margin-bottom: 14px;
+    box-shadow: inset 0 0 12px rgba(255, 216, 74, 0.1);
+  }
+  .concept-explainer summary {
+    cursor: pointer;
+    color: var(--gold);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    list-style: none;
+    padding: 12px 0;
+  }
+  .concept-explainer summary::-webkit-details-marker { display: none; }
+  .concept-explainer summary::before {
+    content: '▶ ';
+    display: inline-block;
+    transition: transform 0.2s;
+  }
+  .concept-explainer[open] summary::before { transform: rotate(90deg); }
+  .explainer-content {
+    padding: 4px 4px 14px;
+    color: var(--parchment);
+    font-size: 14px;
+    line-height: 1.6;
+    border-top: 1px solid rgba(255, 216, 74, 0.2);
+  }
+  .explainer-content p { margin: 10px 0; }
+  .explainer-content ul { margin: 6px 0 6px 20px; }
+  .explainer-content li { margin: 3px 0; }
+
   .snoop-warning {
     margin-top: 12px;
     padding: 10px 14px;
@@ -968,7 +1003,8 @@
     <button class="btn-primary" id="pin-btn">Login</button>
   </div>
   <div class="info" style="margin-top: 10px; margin-bottom: 0;">
-    Crew of Patrick? Voer je PIN in.
+    Crew of Patrick? Voer je PIN in.<br>
+    <span style="opacity:0.7;">Vrijgezellenfeest-tracker · uitleg na inloggen</span>
   </div>
 </div>
 
@@ -981,6 +1017,32 @@
     </div>
   </div>
   <div id="crew-identity" style="font-size: 12px; color: var(--parchment-2); margin-bottom: 10px; font-style: italic;"></div>
+
+  <details class="concept-explainer" open>
+    <summary>📜 Hoe werkt het? (lees voor je begint)</summary>
+    <div class="explainer-content">
+      <p><b style="color: var(--gold);">🎮 Zelda Champion Card</b> — thema gekozen omdat Patje een gamer is/was. Hij ziet zijn eigen heldenkaart die opbouwt naarmate hij opdrachten voltooit.</p>
+
+      <p><b style="color: var(--gold);">⚔️ Het concept</b><br>
+      Patje krijgt 16 opdrachten in totaal:</p>
+      <ul>
+        <li><b>11 pre-opdrachten</b> in de aanloop (1 per crew-lid) — max <b>100 punten</b> elk</li>
+        <li><b>5 finale challenges</b> op de bachelor day zelf — tellen <b>×3</b>, dus max <b>300 punten</b> elk</li>
+      </ul>
+      <p>Totaal te halen: <b>2600 punten</b>. Drempel voor de stripper: <b>2100 punten</b>.</p>
+
+      <p><b style="color: var(--gold);">🎯 Hoe scoren?</b><br>
+      Patje upload bewijs (foto/video) → <b>iedere crew-lid geeft een score 0–100</b> → het gemiddelde van alle 11 stemmen is de definitieve score op zijn kaart.</p>
+
+      <p><b style="color: var(--gold);">🤫 Patje weet van niks</b><br>
+      Hij ziet géén totaal, géén drempel, géén aantal opdrachten. Alleen z'n actieve opdracht en de motiverende push "elke punt telt". Niet doorbabbelen dus.</p>
+
+      <p><b style="color: var(--gold);">👁 Workflow</b><br>
+      <b>René / Niels</b> klikken <b>👁 Zichtbaar voor Patrick</b> wanneer een opdracht aan de beurt is. Dan verschijnt 'ie bij Patje. Na uploaden + scoren klikken zij <b>✓ Score vrijgeven</b> zodat het op zijn kaart komt.</p>
+
+      <p style="opacity:0.8; font-size:12px; font-style:italic; margin-top:10px;">Streng maar rechtvaardig 😈</p>
+    </div>
+  </details>
 
   <div id="crew-total-progress" style="margin-bottom: 14px;">
     <div style="font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--gold); margin-bottom: 6px; letter-spacing: 0.1em;">
@@ -1974,7 +2036,8 @@ function resetLoginPanel() {
       <button class="btn-primary" id="pin-btn">Login</button>
     </div>
     <div class="info" style="margin-top: 10px; margin-bottom: 0;">
-      Crew of Patrick? Voer je PIN in.
+      Crew of Patrick? Voer je PIN in.<br>
+      <span style="opacity:0.7;">Vrijgezellenfeest-tracker · uitleg na inloggen</span>
     </div>
   `;
   document.getElementById('pin-btn').addEventListener('click', tryLogin);
