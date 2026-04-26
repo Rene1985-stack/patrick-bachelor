@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patrick · Champion of Hobbelrade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=MedievalSharp&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #ffd84a;
+    --gold-deep: #c89020;
+    --wood-2: #5c3a1c;
+    --parchment: #f4e4bc;
+    --parchment-2: #e0c890;
+    --sheikah-orange: #ff7a1a;
+    --night: #1a1410;
+    --green: #98e858;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: radial-gradient(ellipse at 50% 50%, #4a3018 0%, #1a0f08 70%);
+    font-family: 'Cormorant Garamond', serif;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 20px 12px; gap: 20px;
+  }
+  .champion-frame {
+    width: 100%; max-width: 500px;
+    border-radius: 18px; overflow: hidden;
+    box-shadow:
+      0 0 0 4px var(--gold), 0 0 0 8px var(--wood-2),
+      0 0 0 10px var(--gold-deep), 0 30px 80px rgba(0,0,0,0.8);
+    animation: pulse-glow 4s ease-in-out infinite;
+    background: var(--night);
+  }
+  .card {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--gold-deep);
+  }
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 4px #ffd84a, 0 0 0 8px #5c3a1c, 0 0 0 10px #c89020, 0 30px 80px rgba(0,0,0,0.8); }
+    50% { box-shadow: 0 0 0 4px #ffe870, 0 0 0 8px #5c3a1c, 0 0 0 10px #c89020, 0 30px 80px rgba(0,0,0,0.8), 0 0 60px rgba(255, 216, 74, 0.4); }
+  }
+  .scene {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, #b8e8f0 0%, #88c8d8 35%, #c8d8a8 55%, #88b078 70%, #4a8038 100%);
+    z-index: 1;
+  }
+  .sun {
+    position: absolute; top: 12%; left: 18%;
+    width: 70px; height: 70px; border-radius: 50%;
+    background: radial-gradient(circle, #fff8d8 0%, #ffd84a 60%, transparent 70%);
+    box-shadow: 0 0 60px 20px rgba(255, 216, 74, 0.4); z-index: 2;
+  }
+  .cloud {
+    position: absolute; z-index: 2;
+    background: white; border-radius: 100px; opacity: 0.85;
+  }
+  .cloud::before, .cloud::after { content: ''; position: absolute; background: white; border-radius: 50%; }
+  .c1 { top: 8%; right: 15%; width: 60px; height: 18px; }
+  .c1::before { width: 30px; height: 30px; top: -16px; left: 8px; }
+  .c1::after { width: 22px; height: 22px; top: -12px; right: 10px; }
+  .c2 { top: 20%; right: 8%; width: 45px; height: 14px; }
+  .c2::before { width: 24px; height: 24px; top: -12px; left: 6px; }
+  .mountains { position: absolute; bottom: 28%; left: 0; right: 0; height: 30%; z-index: 3; }
+  .mountain { position: absolute; bottom: 0; width: 0; height: 0;
+    border-left: solid transparent; border-right: solid transparent; border-bottom: solid; }
+  .m1 { left: -5%; border-left-width: 90px; border-right-width: 90px; border-bottom-width: 130px; border-bottom-color: #6b8090; }
+  .m2 { left: 22%; border-left-width: 110px; border-right-width: 110px; border-bottom-width: 170px; border-bottom-color: #7a8c98; }
+  .m3 { right: -5%; border-left-width: 100px; border-right-width: 100px; border-bottom-width: 150px; border-bottom-color: #6b8090; }
+  .sky-triforce {
+    position: absolute; top: 6%; left: 50%; transform: translateX(-50%);
+    z-index: 3; width: 50px; height: 44px;
+    filter: drop-shadow(0 0 12px rgba(255, 216, 74, 0.8));
+    animation: floaty 3s ease-in-out infinite;
+  }
+  @keyframes floaty {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-6px); }
+  }
+  .grass-fg { position: absolute; bottom: 0; left: 0; right: 0; height: 30%;
+    background: linear-gradient(180deg, #7ab85c 0%, #4a8038 40%, #2c5824 100%);
+    z-index: 5; border-top: 2px solid #98d878; }
+  .tree { position: absolute; z-index: 4; bottom: 28%; }
+  .tree-trunk { width: 8px; height: 22px; background: #5c3a1c; margin: 0 auto; }
+  .tree-leaves { width: 36px; height: 36px;
+    background: radial-gradient(circle at 35% 35%, #6ba84a, #2c5824);
+    border-radius: 50%; border: 2px solid #2c5824;
+    box-shadow: inset -4px -4px 0 rgba(0,0,0,0.15); }
+  .t1 { left: 8%; transform: scale(0.85); }
+  .t2 { right: 6%; transform: scale(0.95); }
+  .t3 { left: 75%; bottom: 30%; transform: scale(0.7); }
+  .character { position: absolute; bottom: 4%; left: 50%;
+    transform: translateX(-50%); width: 240px; height: 320px;
+    z-index: 7; filter: drop-shadow(0 8px 0 rgba(0,0,0,0.2));
+    transition: opacity 0.25s ease; }
+  .pose-label {
+    position: absolute; top: 26%; left: 50%;
+    transform: translateX(-50%);
+    z-index: 9;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    background: rgba(0,0,0,0.7);
+    border: 2px solid var(--gold);
+    border-radius: 4px;
+    padding: 6px 12px;
+    letter-spacing: 0.1em;
+    text-shadow: 1px 1px 0 #1a1410;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transition: opacity 0.25s ease;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .hud { position: absolute; z-index: 10; pointer-events: none; }
+  .hearts { top: 14px; left: 18px; display: flex; gap: 3px; }
+  .heart { width: 20px; height: 20px; }
+  .stamina { top: 14px; right: 18px; width: 40px; height: 40px; }
+  .banner {
+    position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+    z-index: 11;
+    background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-2) 100%);
+    padding: 6px 28px 8px;
+    border: 3px solid var(--wood-2); border-radius: 4px;
+    box-shadow: inset 0 0 0 1px var(--gold), 0 4px 0 var(--wood-2), 0 6px 12px rgba(0,0,0,0.3);
+    text-align: center;
+  }
+  .banner::before, .banner::after {
+    content: ''; position: absolute; top: 50%; transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 18px solid transparent; border-bottom: 18px solid transparent;
+  }
+  .banner::before { left: -16px; border-right: 16px solid var(--wood-2); }
+  .banner::after { right: -16px; border-left: 16px solid var(--wood-2); }
+  .banner-title { font-family: 'MedievalSharp', cursive; font-size: 11px; letter-spacing: 0.3em; color: var(--wood-2); }
+  .banner-name {
+    font-family: 'MedievalSharp', cursive; font-size: 30px;
+    color: var(--gold-deep); line-height: 1; margin-top: 4px;
+    text-shadow: 1px 1px 0 var(--wood-2), -1px 1px 0 var(--wood-2),
+                 1px -1px 0 var(--wood-2), -1px -1px 0 var(--wood-2),
+                 0 2px 0 var(--wood-2);
+    letter-spacing: 0.05em;
+  }
+  .epithet-box {
+    position: absolute; top: 138px; left: 50%; transform: translateX(-50%);
+    z-index: 11; background: rgba(26, 20, 16, 0.78);
+    color: var(--parchment); padding: 4px 14px; border-radius: 12px;
+    font-family: 'MedievalSharp', cursive; font-size: 11px;
+    letter-spacing: 0.1em; border: 1px solid var(--gold); white-space: nowrap;
+  }
+  .stats-panel {
+    width: 100%;
+    background: linear-gradient(180deg, rgba(20, 30, 50, 0.92) 0%, rgba(10, 20, 38, 0.95) 100%);
+    border: none;
+    border-top: 2px solid var(--gold);
+    border-radius: 0;
+    padding: 14px 18px 16px;
+    display: none;
+  }
+  .stats-panel.visible { display: block; }
+  .stats-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 6px; padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 216, 74, 0.25);
+  }
+  .stats-title { font-family: 'Press Start 2P', cursive; font-size: 7px; color: var(--gold); letter-spacing: 0.1em; }
+  .ovr-badge {
+    background: var(--gold); color: var(--night);
+    font-family: 'Press Start 2P', cursive; font-size: 10px;
+    padding: 3px 8px; border-radius: 3px;
+    box-shadow: 0 2px 0 var(--gold-deep);
+  }
+  .stats-grid { display: flex; flex-direction: column; gap: 8px; }
+
+  .attr-row {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 4px;
+    border-bottom: 1px solid rgba(255, 216, 74, 0.12);
+  }
+  .attr-row:last-child { border-bottom: none; }
+  .attr-icon {
+    font-size: 28px;
+    text-align: center;
+    filter: drop-shadow(0 0 6px rgba(255, 216, 74, 0.3));
+  }
+  .attr-info { min-width: 0; }
+  .attr-row .attr-name {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-shadow: 1px 1px 0 #1a1410;
+  }
+  .attr-desc {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    color: var(--parchment-2);
+    font-style: italic;
+    margin-top: 2px;
+    margin-bottom: 4px;
+    opacity: 0.85;
+  }
+  .attr-bar {
+    height: 6px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 216, 74, 0.25);
+  }
+  .attr-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green) 0%, var(--gold) 100%);
+    transition: width 0.6s ease;
+    box-shadow: 0 0 8px rgba(255, 216, 74, 0.4);
+  }
+  .attr-score {
+    font-family: 'MedievalSharp', cursive;
+    font-size: 32px;
+    color: white;
+    font-weight: bold;
+    line-height: 1;
+    min-width: 50px;
+    text-align: center;
+    text-shadow:
+      2px 2px 0 #1a1410,
+      0 0 12px rgba(255, 216, 74, 0.4);
+  }
+  .attr-score.empty {
+    color: rgba(255,255,255,0.25);
+    text-shadow: 2px 2px 0 #1a1410;
+  }
+  .date-stamp {
+    position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+    z-index: 11;
+    font-family: 'Press Start 2P', cursive; font-size: 7px; color: white;
+    text-shadow: 1px 1px 0 var(--wood-2);
+    letter-spacing: 0.15em;
+    background: rgba(0,0,0,0.35); padding: 4px 10px; border-radius: 10px;
+    border: 1px solid var(--gold);
+  }
+  @keyframes sparkle {
+    0%, 100% { opacity: 0; transform: scale(0.5) rotate(0); }
+    50% { opacity: 1; transform: scale(1) rotate(180deg); }
+  }
+  .sparkle { position: absolute; z-index: 8; color: var(--gold);
+    animation: sparkle 2s ease-in-out infinite; pointer-events: none;
+    text-shadow: 0 0 6px white; }
+
+  /* === LOGIN & PANELS === */
+  .panel {
+    width: 100%; max-width: 500px;
+    background: rgba(20, 30, 50, 0.92);
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    padding: 14px; color: var(--parchment);
+  }
+  .login-box { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .login-box input {
+    flex: 1; min-width: 120px; padding: 6px 10px;
+    background: rgba(0,0,0,0.4); color: var(--parchment);
+    border: 1px solid var(--gold);
+    border-radius: 4px; font-family: 'Press Start 2P', monospace;
+    font-size: 10px; letter-spacing: 0.2em;
+  }
+  .login-box input.error { border-color: #e84838; animation: shake 0.4s; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  .btn-primary {
+    background: var(--gold); color: var(--night);
+    border: none; border-radius: 4px; padding: 6px 12px;
+    font-family: 'Press Start 2P', monospace; font-size: 9px;
+    cursor: pointer; box-shadow: 0 2px 0 var(--gold-deep);
+    letter-spacing: 0.05em; white-space: nowrap;
+  }
+  .btn-primary:hover { background: #ffe870; }
+  .btn-small {
+    background: rgba(255, 216, 74, 0.15); color: var(--gold);
+    border: 1px solid var(--gold);
+    border-radius: 4px; padding: 4px 8px;
+    cursor: pointer; font-size: 11px;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .panel-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+  }
+  .panel-header span {
+    font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--gold);
+  }
+  .info {
+    font-size: 12px; opacity: 0.75; margin-bottom: 10px; font-style: italic;
+  }
+  .score-row {
+    display: grid; grid-template-columns: 50px 1fr 80px 70px;
+    gap: 8px; align-items: center;
+    padding: 6px 8px; background: rgba(0,0,0,0.2);
+    border-radius: 4px;
+    border-left: 3px solid var(--wood-2);
+    margin-bottom: 6px;
+  }
+  .score-row.has-score { background: rgba(152, 232, 88, 0.08); border-left-color: var(--green); }
+  .score-row.has-upload { background: rgba(255, 122, 26, 0.08); border-left-color: var(--sheikah-orange); }
+  .score-row.has-score.has-upload { border-left-color: var(--green); }
+  .score-row .key { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--gold); letter-spacing: 0.05em; }
+  .score-row .meta { font-size: 12px; line-height: 1.3; }
+  .score-row .meta b { font-weight: bold; }
+  .score-row .meta .dt { opacity: 0.6; font-size: 10px; }
+  .score-row .meta .tk { opacity: 0.7; font-size: 11px; font-style: italic; display: block; }
+  .score-row .meta .uploads-count { color: var(--sheikah-orange); font-size: 10px; font-weight: bold; display: block; margin-top: 2px; }
+  .score-row .meta .attr-meta {
+    display: block; margin-top: 2px;
+    color: var(--gold); font-size: 11px;
+    font-family: 'MedievalSharp', cursive;
+    font-style: italic;
+  }
+  .release-btn {
+    display: inline-block; margin-top: 4px;
+    background: rgba(0,0,0,0.3); color: rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 3px; padding: 3px 8px;
+    cursor: pointer; font-size: 10px;
+    font-family: 'Cormorant Garamond', serif;
+    transition: all 0.2s;
+  }
+  .release-btn:hover { background: rgba(255,255,255,0.08); }
+  .release-btn.released {
+    background: rgba(152, 232, 88, 0.2); color: var(--green);
+    border-color: var(--green);
+  }
+  .publish-btn {
+    display: inline-block; margin-top: 4px; margin-left: 4px;
+    background: rgba(0,0,0,0.3); color: rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 3px; padding: 3px 8px;
+    cursor: pointer; font-size: 10px;
+    font-family: 'Cormorant Garamond', serif;
+    transition: all 0.2s;
+  }
+  .publish-btn:hover { background: rgba(255,255,255,0.08); }
+  .publish-btn.published {
+    background: rgba(255, 216, 74, 0.2); color: var(--gold);
+    border-color: var(--gold);
+  }
+  .release-status {
+    display: inline-block; margin-top: 4px;
+    background: rgba(0,0,0,0.2); color: rgba(255,255,255,0.4);
+    border: 1px dashed rgba(255,255,255,0.15);
+    border-radius: 3px; padding: 3px 8px;
+    font-size: 10px;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .release-status.released {
+    background: rgba(152, 232, 88, 0.1); color: rgba(152, 232, 88, 0.7);
+    border-color: rgba(152, 232, 88, 0.3);
+  }
+  .avg-display {
+    display: block; margin-top: 4px;
+    color: var(--gold); font-size: 11px;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .avg-display b { color: white; font-size: 13px; }
+  .score-row input.score {
+    padding: 6px 8px; background: rgba(0,0,0,0.4);
+    color: white; border: 1px solid var(--gold);
+    border-radius: 4px; font-family: 'MedievalSharp', cursive;
+    font-size: 14px; font-weight: bold; text-align: center;
+  }
+  .uploads-preview {
+    grid-column: 1 / -1; margin-top: 6px;
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .uploads-preview img, .uploads-preview video {
+    max-width: 80px; max-height: 80px; border-radius: 3px;
+    border: 1px solid var(--gold); cursor: pointer;
+  }
+  .uploads-preview .file-link {
+    background: rgba(255,216,74,0.15); color: var(--gold);
+    border: 1px solid var(--gold); border-radius: 3px;
+    padding: 4px 8px; font-size: 11px;
+    text-decoration: none;
+  }
+  .footnote {
+    margin-top: 14px; padding: 10px;
+    background: rgba(0,0,0,0.3); border-radius: 6px;
+    font-size: 11px; line-height: 1.5; opacity: 0.85;
+  }
+  .footnote b { color: var(--gold); }
+  .status { margin-top: 10px; font-size: 11px; font-style: italic; min-height: 1.2em; }
+  .status.ok { color: var(--green); }
+  .status.err { color: #e84838; }
+  .tagline {
+    color: #c4a96f; font-size: 12px; font-style: italic;
+    text-align: center; max-width: 500px;
+  }
+  .config-warn {
+    background: #e84838; color: white; padding: 10px 14px;
+    border-radius: 6px; max-width: 500px; width: 100%;
+    text-align: center; font-size: 13px;
+  }
+  .config-warn code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; }
+
+  .snoop-warning {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #8b1e1e, #c4302b);
+    border: 2px solid var(--gold);
+    border-radius: 6px;
+    color: white;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    box-shadow: 0 0 20px rgba(232, 72, 56, 0.5);
+  }
+  .snoop-warning.show {
+    opacity: 1;
+    transform: translateY(0);
+    animation: snoop-shake 0.4s;
+  }
+  @keyframes snoop-shake {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    25% { transform: translateY(0) translateX(-4px); }
+    75% { transform: translateY(0) translateX(4px); }
+  }
+
+  /* === PATRICK VIEW === */
+  .patrick-quest {
+    background: linear-gradient(180deg, rgba(255, 216, 74, 0.15) 0%, rgba(255, 122, 26, 0.1) 100%);
+    border: 3px solid var(--gold);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 14px;
+    position: relative;
+    box-shadow: 0 0 30px rgba(255, 216, 74, 0.2);
+  }
+  .quest-tag {
+    position: absolute; top: -12px; left: 18px;
+    background: var(--gold); color: var(--night);
+    font-family: 'Press Start 2P', monospace; font-size: 9px;
+    padding: 4px 10px; border-radius: 4px;
+    box-shadow: 0 2px 0 var(--gold-deep);
+    letter-spacing: 0.1em;
+  }
+  .quest-key {
+    font-family: 'Press Start 2P', monospace; font-size: 14px;
+    color: var(--gold); margin-top: 6px; letter-spacing: 0.1em;
+  }
+  .quest-from {
+    font-family: 'Press Start 2P', monospace; font-size: 9px;
+    color: var(--gold);
+    margin-top: 8px; letter-spacing: 0.1em;
+  }
+  .quest-from b { color: white; font-size: 11px; font-family: 'MedievalSharp', cursive; letter-spacing: 0.05em; }
+  .quest-message {
+    font-family: 'Cormorant Garamond', serif; font-size: 15px;
+    color: var(--parchment); margin-top: 0; line-height: 1.5;
+    background: rgba(0,0,0,0.3);
+    border-left: 3px solid var(--gold);
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    font-style: italic;
+  }
+  .message-collapse {
+    margin-top: 12px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255, 216, 74, 0.3);
+    border-radius: 6px;
+    padding: 0 10px;
+  }
+  .message-collapse summary {
+    cursor: pointer;
+    color: var(--gold);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    letter-spacing: 0.05em;
+    list-style: none;
+    padding: 8px 0;
+  }
+  .message-collapse summary::-webkit-details-marker { display: none; }
+  .message-collapse summary::before {
+    content: '▶ ';
+    display: inline-block;
+    transition: transform 0.2s;
+  }
+  .message-collapse[open] summary::before { transform: rotate(90deg); }
+  .message-collapse[open] { padding-bottom: 10px; }
+  .message-collapse.small summary { font-size: 8px; padding: 6px 0; }
+  .message-collapse.small .quest-message { font-size: 13px; padding: 8px 12px; }
+  .quest-task {
+    font-family: 'MedievalSharp', cursive; font-size: 17px;
+    color: white; margin-top: 10px; line-height: 1.4;
+  }
+  .quest-status {
+    margin-top: 12px; padding: 10px 12px;
+    background: rgba(0,0,0,0.3); border-radius: 6px;
+    font-size: 13px; line-height: 1.5;
+  }
+  .quest-status.uploaded { background: rgba(255,122,26,0.15); border: 1px solid var(--sheikah-orange); }
+  .quest-status.scored { background: rgba(152,232,88,0.15); border: 1px solid var(--green); }
+  .quest-status .lbl {
+    font-family: 'Press Start 2P', monospace; font-size: 9px;
+    letter-spacing: 0.1em; display: block; margin-bottom: 4px;
+  }
+  .quest-status.uploaded .lbl { color: var(--sheikah-orange); }
+  .quest-status.scored .lbl { color: var(--green); }
+
+  .upload-zone {
+    margin-top: 12px;
+    border: 2px dashed var(--gold);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    background: rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .upload-zone:hover { background: rgba(255,216,74,0.08); }
+  .upload-zone.drag { background: rgba(255,216,74,0.15); border-color: #ffe870; }
+  .upload-zone p {
+    color: var(--gold); font-family: 'Press Start 2P', monospace;
+    font-size: 9px; letter-spacing: 0.1em;
+  }
+  .upload-zone span {
+    color: var(--parchment-2); font-size: 12px; font-style: italic;
+    display: block; margin-top: 6px;
+  }
+  .upload-zone input[type="file"] { display: none; }
+
+  .upload-progress {
+    margin-top: 10px; height: 6px; background: rgba(0,0,0,0.3); border-radius: 3px; overflow: hidden;
+  }
+  .upload-progress .bar { height: 100%; background: var(--gold); width: 0; transition: width 0.2s; }
+
+  .uploaded-files {
+    margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .upload-tips {
+    margin-top: 10px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255, 216, 74, 0.3);
+    border-radius: 6px;
+    padding: 8px 12px;
+  }
+  .upload-tips summary {
+    cursor: pointer;
+    color: var(--gold);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    letter-spacing: 0.05em;
+    list-style: none;
+    padding: 4px 0;
+  }
+  .upload-tips summary::-webkit-details-marker { display: none; }
+  .upload-tips summary::before {
+    content: '▶ ';
+    display: inline-block;
+    transition: transform 0.2s;
+  }
+  .upload-tips[open] summary::before { transform: rotate(90deg); }
+  .tips-content {
+    padding: 8px 4px 4px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--parchment);
+  }
+  .tips-content p { margin: 6px 0; }
+  .tips-content ul { margin: 4px 0 8px 18px; }
+  .tips-content li { margin: 2px 0; }
+  .tips-content b { color: var(--gold); }
+  .uploaded-files .preview {
+    position: relative;
+    width: 90px; height: 90px;
+    border-radius: 6px; overflow: hidden;
+    border: 2px solid var(--gold);
+  }
+  .uploaded-files .preview img, .uploaded-files .preview video {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .uploaded-files .preview .file-icon {
+    width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold); font-size: 24px;
+  }
+  .uploaded-files .preview .del-upload {
+    position: absolute; top: 2px; right: 2px;
+    width: 22px; height: 22px;
+    background: rgba(232, 72, 56, 0.9);
+    color: white; border: 1px solid white;
+    border-radius: 50%; cursor: pointer;
+    font-size: 11px; font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0; line-height: 1;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  }
+  .uploaded-files .preview .del-upload:hover {
+    background: #e84838;
+    transform: scale(1.1);
+  }
+
+  .progress-bar {
+    background: rgba(0,0,0,0.3); border: 1px solid var(--gold);
+    border-radius: 6px; height: 24px; position: relative; overflow: hidden;
+    margin: 8px 0;
+  }
+  .progress-bar .fill {
+    height: 100%; background: linear-gradient(90deg, var(--green), var(--gold));
+    transition: width 0.5s;
+  }
+  .progress-bar .label {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Press Start 2P', monospace; font-size: 9px;
+    color: white; text-shadow: 1px 1px 0 black;
+  }
+  .progress-bar.with-threshold { overflow: visible; }
+  .threshold-marker {
+    position: absolute;
+    left: 80.77%;
+    top: -4px; bottom: -4px;
+    width: 2px; background: #e84838;
+    z-index: 2;
+    box-shadow: 0 0 8px rgba(232, 72, 56, 0.8);
+  }
+  .threshold-marker::before {
+    content: '🩲'; position: absolute;
+    top: -18px; left: 50%; transform: translateX(-50%);
+    font-size: 14px;
+  }
+
+  .gold-override-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(180deg, #ffe870 0%, #ffd84a 50%, #c89020 100%);
+    color: var(--night);
+    border: 2px solid #c89020;
+    border-radius: 8px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.5),
+      0 4px 0 #8a6914,
+      0 8px 20px rgba(255, 216, 74, 0.4);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+    transition: all 0.15s;
+    animation: gold-pulse 2s ease-in-out infinite;
+  }
+  .gold-override-btn:hover {
+    background: linear-gradient(180deg, #fff8b0 0%, #ffe870 50%, #d4a72c 100%);
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.5),
+      0 5px 0 #8a6914,
+      0 10px 30px rgba(255, 216, 74, 0.6);
+  }
+  .gold-override-btn:active {
+    transform: translateY(2px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 0 #8a6914;
+  }
+  @keyframes gold-pulse {
+    0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 4px 0 #8a6914, 0 8px 20px rgba(255, 216, 74, 0.4); }
+    50% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 4px 0 #8a6914, 0 8px 30px rgba(255, 216, 74, 0.8); }
+  }
+  .gold-override-btn.active {
+    background: linear-gradient(180deg, #fff8b0 0%, #ffe870 50%, #d4a72c 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.6),
+      inset 0 0 30px rgba(255,255,255,0.3),
+      0 4px 0 #8a6914,
+      0 0 40px rgba(255, 216, 74, 0.7);
+  }
+  .override-used {
+    text-align: center; padding: 10px;
+    background: linear-gradient(180deg, rgba(255, 216, 74, 0.2), rgba(200, 144, 32, 0.2));
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-shadow: 0 0 8px rgba(255, 216, 74, 0.6);
+  }
+
+  .urgency-banner {
+    background: linear-gradient(135deg, #8b1e1e 0%, #c4302b 50%, #8b1e1e 100%);
+    border: 3px solid #ffd84a;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    text-align: center;
+    color: white;
+    box-shadow:
+      0 0 0 2px #5c3a1c,
+      0 0 30px rgba(232, 72, 56, 0.5),
+      inset 0 0 20px rgba(0,0,0,0.3);
+    animation: urgency-pulse 2.5s ease-in-out infinite;
+  }
+  .urgency-banner.unlocked {
+    background: linear-gradient(135deg, #2c5824 0%, #5fa84a 50%, #2c5824 100%);
+    box-shadow:
+      0 0 0 2px #5c3a1c,
+      0 0 30px rgba(152, 232, 88, 0.6),
+      inset 0 0 20px rgba(0,0,0,0.3);
+  }
+  @keyframes urgency-pulse {
+    0%, 100% { box-shadow: 0 0 0 2px #5c3a1c, 0 0 30px rgba(232, 72, 56, 0.5), inset 0 0 20px rgba(0,0,0,0.3); }
+    50% { box-shadow: 0 0 0 2px #5c3a1c, 0 0 50px rgba(232, 72, 56, 0.8), inset 0 0 20px rgba(0,0,0,0.3); }
+  }
+  .urgency-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-shadow: 2px 2px 0 #1a1410, 0 0 12px rgba(255, 216, 74, 0.6);
+    margin-bottom: 8px;
+    color: var(--gold);
+  }
+  .urgency-body {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    line-height: 1.5;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+  }
+  .urgency-body b { color: var(--gold); font-size: 16px; }
+
+  .no-quest {
+    text-align: center; padding: 30px 20px;
+    color: var(--parchment-2); font-style: italic;
+  }
+  .no-quest h3 { font-family: 'MedievalSharp', cursive; color: var(--gold); font-size: 18px; margin-bottom: 6px; }
+
+  @media (max-width: 500px) {
+    .score-row { grid-template-columns: 40px 1fr 60px 50px; gap: 4px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="config-warn" class="config-warn" style="display:none;">
+  ⚠️ Firebase niet geconfigureerd of fout
+</div>
+
+<!-- ========== ZELDA CARD ========== -->
+<!-- ========== CHAMPION FRAME (kaart + abilities geïntegreerd) ========== -->
+<div class="champion-frame">
+<div class="card">
+  <div class="scene"></div>
+  <div class="sun"></div>
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+
+  <svg class="sky-triforce" viewBox="0 0 50 44">
+    <g stroke="#8a5a10" stroke-width="1.5">
+      <polygon points="25,2 14,22 36,22" fill="#ffe870"/>
+      <polygon points="14,23 3,43 25,43" fill="#ffd84a"/>
+      <polygon points="36,23 25,43 47,43" fill="#ffd84a"/>
+    </g>
+  </svg>
+
+  <div class="mountains">
+    <div class="mountain m1"></div>
+    <div class="mountain m2"></div>
+    <div class="mountain m3"></div>
+  </div>
+
+  <div class="tree t1"><div class="tree-leaves"></div><div class="tree-trunk"></div></div>
+  <div class="tree t2"><div class="tree-leaves"></div><div class="tree-trunk"></div></div>
+  <div class="tree t3"><div class="tree-leaves"></div><div class="tree-trunk"></div></div>
+
+  <div class="grass-fg"></div>
+
+  <div class="sparkle" style="top: 36%; left: 14%; font-size: 14px;">✦</div>
+  <div class="sparkle" style="top: 42%; right: 12%; font-size: 18px; animation-delay: 0.5s;">✧</div>
+  <div class="sparkle" style="top: 30%; right: 22%; font-size: 12px; animation-delay: 1s;">✦</div>
+  <div class="sparkle" style="top: 50%; left: 10%; font-size: 16px; animation-delay: 1.5s;">✧</div>
+
+  <svg class="character" id="character-svg" viewBox="0 0 230 300" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="tunicGrad" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#7ad068"/><stop offset="50%" stop-color="#5fa84a"/><stop offset="100%" stop-color="#3a7028"/>
+      </linearGradient>
+      <linearGradient id="skinGrad" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#fae0b8"/><stop offset="100%" stop-color="#e0b888"/>
+      </linearGradient>
+      <linearGradient id="bootGrad" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#8b5a2b"/><stop offset="100%" stop-color="#5c3a1c"/>
+      </linearGradient>
+      <radialGradient id="bgGlow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0%" stop-color="rgba(255,216,74,0.4)"/><stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+    </defs>
+    <ellipse cx="115" cy="170" rx="105" ry="125" fill="url(#bgGlow)"/>
+    <ellipse cx="115" cy="285" rx="58" ry="6" fill="rgba(0,0,0,0.4)"/>
+    <path d="M 90 210 Q 88 240, 86 264 L 102 264 Q 104 240, 106 210 Z" fill="#d8c898" stroke="#1a1410" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 124 210 Q 126 240, 128 264 L 144 264 Q 142 240, 140 210 Z" fill="#d8c898" stroke="#1a1410" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 82 262 L 106 262 L 108 280 Q 108 284, 104 284 L 80 284 Q 76 284, 76 280 Z" fill="url(#bootGrad)" stroke="#1a1410" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 122 262 L 146 262 L 150 280 Q 150 284, 146 284 L 122 284 Q 118 284, 118 280 Z" fill="url(#bootGrad)" stroke="#1a1410" stroke-width="2.5" stroke-linejoin="round"/>
+    <line x1="80" y1="274" x2="106" y2="274" stroke="#3a2418" stroke-width="2"/>
+    <line x1="120" y1="274" x2="148" y2="274" stroke="#3a2418" stroke-width="2"/>
+    <path d="M 66 118 Q 62 148, 64 188 Q 62 210, 84 215 L 146 215 Q 168 210, 166 188 Q 168 148, 164 118 Q 146 108, 115 108 Q 84 108, 66 118 Z" fill="url(#tunicGrad)" stroke="#1a1410" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="64" y="186" width="102" height="13" fill="#8b5a2b" stroke="#1a1410" stroke-width="2.5" rx="2"/>
+    <rect x="104" y="186" width="22" height="13" fill="#ffd84a" stroke="#1a1410" stroke-width="2"/>
+    <polygon points="115,190 109,197 121,197" fill="#c89020" stroke="#1a1410" stroke-width="1"/>
+    <path d="M 94 108 L 115 138 L 136 108 L 136 118 L 115 142 L 94 118 Z" fill="#3a7028" stroke="#1a1410" stroke-width="2"/>
+    <path d="M 66 118 Q 62 148, 64 188 L 76 186 Q 74 148, 78 120 Z" fill="rgba(0,0,0,0.18)"/>
+    <g transform="translate(105, 153)">
+      <circle r="14" fill="#3a7028" stroke="#1a1410" stroke-width="1.5"/>
+      <polygon points="0,-8 -7,4 7,4" fill="#ffd84a" stroke="#1a1410" stroke-width="1"/>
+    </g>
+    <path d="M 166 122 Q 184 138, 188 164 Q 186 178, 176 175 Q 168 164, 164 138 Z" fill="url(#tunicGrad)" stroke="#1a1410" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="182" cy="172" r="11" fill="url(#skinGrad)" stroke="#1a1410" stroke-width="2.5"/>
+    <g transform="translate(182, 172) rotate(-18)">
+      <rect x="-3" y="-2" width="6" height="14" fill="#3060a0" stroke="#1a1410" stroke-width="1.5" rx="1"/>
+      <line x1="-3" y1="2" x2="3" y2="2" stroke="#1a1410" stroke-width="0.8"/>
+      <line x1="-3" y1="6" x2="3" y2="6" stroke="#1a1410" stroke-width="0.8"/>
+      <path d="M -11 -4 L 11 -4 L 13 -10 L -13 -10 Z" fill="#ffd84a" stroke="#1a1410" stroke-width="1.5" stroke-linejoin="round"/>
+      <circle cx="0" cy="-7" r="2.5" fill="#5fc8e0" stroke="#1a1410" stroke-width="0.8"/>
+      <path d="M -5 -10 L 5 -10 L 4 -76 L 0 -84 L -4 -76 Z" fill="#e8eef4" stroke="#1a1410" stroke-width="1.5" stroke-linejoin="round"/>
+      <line x1="0" y1="-12" x2="0" y2="-78" stroke="#a0b0c0" stroke-width="1"/>
+      <path d="M -11 -4 Q -18 -8, -16 -16" fill="none" stroke="#1a1410" stroke-width="1.5"/>
+      <path d="M 11 -4 Q 18 -8, 16 -16" fill="none" stroke="#1a1410" stroke-width="1.5"/>
+    </g>
+    <path d="M 64 122 Q 46 138, 42 166 Q 44 178, 54 176 Q 64 166, 66 138 Z" fill="url(#tunicGrad)" stroke="#1a1410" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="50" cy="174" r="10" fill="url(#skinGrad)" stroke="#1a1410" stroke-width="2.5"/>
+    <path d="M 100 96 L 100 112 L 130 112 L 130 96 Z" fill="url(#skinGrad)" stroke="#1a1410" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 100 106 L 130 106" stroke="#c89868" stroke-width="1" opacity="0.5"/>
+    <path d="M 150 64 Q 162 62, 164 52 Q 162 68, 154 74 Q 150 72, 148 66 Z" fill="url(#skinGrad)" stroke="#1a1410" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 80 64 Q 68 62, 66 52 Q 68 68, 76 74 Q 80 72, 82 66 Z" fill="url(#skinGrad)" stroke="#1a1410" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 82 52 Q 80 30, 95 20 Q 115 12, 135 20 Q 150 30, 148 52 Q 150 78, 144 92 Q 134 100, 115 100 Q 96 100, 86 92 Q 80 78, 82 52 Z" fill="url(#skinGrad)" stroke="#1a1410" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 80 38 Q 74 16, 94 8 Q 105 2, 115 6 Q 125 2, 136 8 Q 156 16, 150 42 Q 148 28, 138 24 L 136 16 Q 128 22, 122 14 L 120 22 Q 112 16, 106 22 L 104 14 Q 96 22, 92 16 L 90 24 Q 82 28, 80 38 Z" fill="#2a1810" stroke="#1a1410" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 90 22 L 86 12 L 92 18 Z" fill="#2a1810" stroke="#1a1410" stroke-width="2"/>
+    <path d="M 104 18 L 102 6 L 110 16 Z" fill="#2a1810" stroke="#1a1410" stroke-width="2"/>
+    <path d="M 120 16 L 120 6 L 126 16 Z" fill="#2a1810" stroke="#1a1410" stroke-width="2"/>
+    <path d="M 134 22 L 138 10 L 140 22 Z" fill="#2a1810" stroke="#1a1410" stroke-width="2"/>
+    <path d="M 96 18 Q 100 14, 108 16" stroke="#5a3828" stroke-width="2" fill="none" opacity="0.6"/>
+    <path d="M 92 52 Q 98 49, 104 52" fill="none" stroke="#1a1410" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 124 52 Q 130 49, 136 52" fill="none" stroke="#1a1410" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="110" y1="60" x2="120" y2="60" stroke="#1a1410" stroke-width="2.5"/>
+    <path d="M 86 58 Q 84 55, 92 54 L 108 54 Q 112 55, 110 62 Q 108 70, 100 70 Q 89 69, 86 62 Z" fill="#1a1a1a" stroke="#1a1410" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 122 54 L 138 54 Q 146 55, 144 62 Q 141 69, 130 70 Q 122 70, 120 62 Q 118 55, 122 54 Z" fill="#1a1a1a" stroke="#1a1410" stroke-width="2" stroke-linejoin="round"/>
+    <ellipse cx="96" cy="60" rx="3" ry="2" fill="white" opacity="0.7"/>
+    <ellipse cx="128" cy="60" rx="3" ry="2" fill="white" opacity="0.7"/>
+    <line x1="86" y1="60" x2="78" y2="58" stroke="#1a1410" stroke-width="2"/>
+    <line x1="144" y1="60" x2="152" y2="58" stroke="#1a1410" stroke-width="2"/>
+    <path d="M 113 66 Q 111 76, 115 80 Q 119 76, 117 66" fill="none" stroke="#1a1410" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 86 80 Q 84 92, 90 96 Q 94 100, 100 100 Q 104 94, 115 94 Q 126 94, 130 100 Q 136 100, 140 96 Q 146 92, 144 80 Q 138 86, 130 86 Q 122 82, 115 82 Q 108 82, 100 86 Q 92 86, 86 80 Z" fill="#2a1810" stroke="#1a1410" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 102 78 Q 115 82, 128 78" fill="none" stroke="#1a0808" stroke-width="1.8" opacity="0.7"/>
+    <path d="M 106 86 Q 115 89, 124 86" fill="none" stroke="#3a1810" stroke-width="1.5" stroke-linecap="round"/>
+    <ellipse cx="90" cy="74" rx="4" ry="3" fill="#e8a888" opacity="0.5"/>
+    <ellipse cx="140" cy="74" rx="4" ry="3" fill="#e8a888" opacity="0.5"/>
+  </svg>
+  <div class="pose-label" id="pose-label"></div>
+
+  <div class="hud hearts" id="hearts"></div>
+  <div class="hud stamina" id="stamina"></div>
+  <div class="date-stamp">★ QUEST LOG ★</div>
+
+  <div class="banner">
+    <div class="banner-title">CHAMPION</div>
+    <div class="banner-name">PATRICK</div>
+  </div>
+
+  <div class="epithet-box">⚔ Held van Hobbelrade ⚔</div>
+</div>
+
+<!-- ========== ABILITIES (geïntegreerd in champion-frame) ========== -->
+<div class="stats-panel">
+  <div class="stats-header">
+    <span class="stats-title">★ ABILITIES ★</span>
+    <span class="ovr-badge" id="ovr-badge">LV ??</span>
+  </div>
+  <div class="stats-grid" id="stats-grid"></div>
+</div>
+</div>
+<!-- /champion-frame -->
+
+<!-- ========== LOGIN ========== -->
+<div class="panel" id="login-panel">
+  <div class="login-box">
+    <span style="color: var(--gold); font-size: 14px;">🔒</span>
+    <input type="password" id="pin-input" placeholder="PIN" autocomplete="off"/>
+    <button class="btn-primary" id="pin-btn">Login</button>
+  </div>
+  <div class="info" style="margin-top: 10px; margin-bottom: 0;">
+    Crew of Patrick? Voer je PIN in.
+  </div>
+</div>
+
+<!-- ========== CREW PANEL ========== -->
+<div class="panel" id="crew-panel" style="display:none;">
+  <div class="panel-header">
+    <span>⚙ CREW · SCORE PANEL</span>
+    <div style="display:flex; gap:8px;">
+      <button class="btn-small" id="lock-btn-crew">✕ Logout</button>
+    </div>
+  </div>
+  <div id="crew-identity" style="font-size: 12px; color: var(--parchment-2); margin-bottom: 10px; font-style: italic;"></div>
+
+  <div id="crew-total-progress" style="margin-bottom: 14px;">
+    <div style="font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--gold); margin-bottom: 6px; letter-spacing: 0.1em;">
+      ★ TOTAAL VERLOOP ★
+    </div>
+    <div class="progress-bar with-threshold">
+      <div class="threshold-marker"></div>
+      <div class="fill" id="crew-progress-fill"></div>
+      <div class="label" id="crew-progress-label">0 / 0</div>
+    </div>
+    <div style="font-size: 11px; opacity: 0.8; font-style: italic; margin-top: 4px;">
+      Drempel <b style="color: var(--gold);">2100</b> punten van 2600 voor een stripper. Weekend opdrachten tellen 3×.
+    </div>
+  </div>
+
+  <div id="crew-override" style="margin-bottom: 14px;"></div>
+
+  <div class="info">René en Niels geven opdrachten vrij. Iedereen scoort 0–100. Klik op uploads om bewijs te bekijken.</div>
+  <div id="score-list"></div>
+  <div class="status" id="crew-status"></div>
+  <div class="footnote">
+    <b>Workflow:</b> 1) <b>René of Niels</b> klikt <b>👁 Zichtbaar voor Patrick</b> → opdracht verschijnt in zijn quest log. 2) Patrick uploadt bewijs. 3) <b>Iedere crew member</b> geeft een score (0–100). Het gemiddelde komt op de kaart. PIN crew: <b>2305</b> · PIN Patrick: <b>PATJE</b>.
+  </div>
+</div>
+
+<!-- ========== PATRICK PANEL ========== -->
+<div class="panel" id="patrick-panel" style="display:none;">
+  <div class="panel-header">
+    <span>⚔ PATJE · QUEST LOG</span>
+    <button class="btn-small" id="lock-btn-patrick">✕ Logout</button>
+  </div>
+
+  <div id="patrick-banner"></div>
+
+  <div style="margin-bottom: 14px;">
+    <div style="font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--gold); margin-bottom: 8px; letter-spacing: 0.1em; text-align: center;">
+      ★ JOUW VERLOOP ★
+    </div>
+    <div class="progress-bar">
+      <div class="fill" id="patrick-progress-fill"></div>
+      <div class="label" id="patrick-progress-label">0 / 0</div>
+    </div>
+    <div style="font-size: 12px; opacity: 0.85; font-style: italic; text-align: center; margin-top: 6px;">
+      Hoe meer punten, hoe meer er ontgrendeld wordt op het moment suprême 🔥
+    </div>
+  </div>
+
+  <div id="patrick-quests"></div>
+  <div id="patrick-banner-bottom"></div>
+  <div class="status" id="patrick-status"></div>
+</div>
+
+<div class="tagline" id="tagline">Deel deze link met de crew. Patrick krijgt een eigen PIN.</div>
+
+<!-- Modal for viewing uploads -->
+<div id="upload-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center; padding:20px;">
+  <div style="position:relative; max-width:90vw; max-height:90vh;">
+    <button id="modal-close" style="position:absolute; top:-40px; right:0; background:var(--gold); color:var(--night); border:none; border-radius:4px; padding:6px 12px; cursor:pointer; font-family:'Press Start 2P', monospace; font-size:9px;">✕ Sluit</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCNp9TOpqSUhL0t2y5qBpw1tWoHcOrX56M",
+  authDomain: "patrick-bachelor.firebaseapp.com",
+  projectId: "patrick-bachelor",
+  storageBucket: "patrick-bachelor.firebasestorage.app",
+  messagingSenderId: "112446848886",
+  appId: "1:112446848886:web:f1818b3ce9c762dc838457",
+  measurementId: "G-YQJR5RKEPD"
+};
+
+// === CLOUDINARY voor foto/video uploads (gratis, vervangt Firebase Storage) ===
+// Vul in na aanmaken Cloudinary account (zie instructies):
+const CLOUDINARY_CLOUD_NAME = "djlb696ab";
+const CLOUDINARY_UPLOAD_PRESET = "patrick_bachelor";
+
+const CREW_PIN = "2305";
+const PATRICK_PIN = "PATJE";
+
+const CREW_MEMBERS = [
+  { id: 'rene',   name: 'René' },
+  { id: 'pieter', name: 'Pieter' },
+  { id: 'ralph',  name: 'Ralph' },
+  { id: 'thomas', name: 'Thomas' },
+  { id: 'timo',   name: 'Timo' },
+  { id: 'yoram',  name: 'Yoram' },
+  { id: 'kay',    name: 'Kay' },
+  { id: 'david',  name: 'David' },
+  { id: 'rocco',  name: 'Rocco' },
+  { id: 'dennis', name: 'Dennis' },
+  { id: 'niels',  name: 'Niels' },
+];
+
+// Alleen deze crew members kunnen opdrachten zichtbaar/verborgen schakelen voor Patrick
+const ADMIN_IDS = ['rene', 'niels'];
+
+// René en Niels kunnen de Gold Override aan/uit zetten
+const OVERRIDE_CREW_IDS = ['rene', 'niels'];
+
+const STRIPPER_THRESHOLD = 2100;
+const OVERRIDE_POINTS = 2101;
+const MAX_UPLOAD_BYTES = 100 * 1024 * 1024; // 100 MB Cloudinary free tier limit
+
+// 5 character attributen (RPG stijl) gebaseerd op opdracht-groepen
+const ATTRIBUTES = [
+  { id: 'warrior',  name: 'WARRIOR',  icon: '🛡', keys: ['SHO', 'BRV', 'HIK'],        desc: 'Kracht & moed' },
+  { id: 'artisan',  name: 'ARTISAN',  icon: '🔨', keys: ['PUZ', 'BLD', 'RNG'],        desc: 'Vakmanschap' },
+  { id: 'sage',     name: 'SAGE',     icon: '🧠', keys: ['OBS', 'IQ', 'CAF'],         desc: 'Wijsheid & kennis' },
+  { id: 'bard',     name: 'BARD',     icon: '🎤', keys: ['VOC', 'SNG', 'MJ', 'DUR'],  desc: 'Performance' },
+  { id: 'diplomat', name: 'DIPLOMAT', icon: '❤️', keys: ['FAM', 'SQD', 'SWG'],        desc: 'Charme & netwerk' },
+];
+
+// Get attribute score: average of published averages of relevant opdrachten that are visible
+function getAttributeScore(attr, visibleOpdrachten) {
+  const relevantOps = visibleOpdrachten.filter(o => attr.keys.includes(o.key));
+  const scored = relevantOps.filter(o => getPublishedAverage(o.key) != null);
+  if (scored.length === 0) return null;
+  const total = scored.reduce((s, o) => s + getPublishedAverage(o.key), 0);
+  return Math.round(total / scored.length);
+}
+
+// Weekend opdrachten tellen 3x
+function getMultiplier(opdracht) {
+  return opdracht.section === 'weekend' ? 3 : 1;
+}
+
+// Pre-feest opdrachten + Bachelor weekend
+const OPDRACHTEN = [
+  // === Pre-feest ===
+  { key: 'SHO', name: 'René',   date: '26 apr', dateObj: '2026-04-26', task: 'Schoenmaat & schoenencollectie', attribute: 'Fysieke Specs', section: 'pre',
+    message: 'Hé Patrick, dit is het begin van een aantal berichten. Voer ze allemaal nauwkeurig uit. Er mogen geen vragen worden gesteld. En denk eraan, je gaat elk punt nodig hebben op het moment suprême, dus voer je opdrachten met verve uit en laat geen punt liggen. Hoeveel paar schoenen heb jij? Zijn deze allemaal zelfde schoenmaat? Reken je gemiddelde schoenmaat uit en stuur een foto van je schoenen collectie. Ga je nodig hebben als het zover is 😉' },
+  { key: 'FAM', name: 'Pieter', date: '30 apr', dateObj: '2026-04-30', task: '5 selfies met dorpelingen', attribute: 'Bekendheidsfactor Spaubeek', section: 'pre',
+    message: 'Patrick, stuur 5 verschillende selfies met mensen uit het dorp. Ga je nodig hebben als het zover is.' },
+  { key: 'OBS', name: 'Ralph',  date: '2 mei',  dateObj: '2026-05-02', task: 'Wandeling Hobbelrade', attribute: 'Observatievermogen', section: 'pre',
+    message: 'Hey man, ga vandaag 30 min wandelen door Hobbelrade en stuur 3 dingen die je opvallen. Ga je nodig hebben als het zover is.' },
+  { key: 'BRV', name: 'Thomas', date: '5 mei',  dateObj: '2026-05-05', task: 'Hoogte-tolerantie', attribute: 'Moedlevel', section: 'pre',
+    message: 'Patrick, hoe goed kun jij tegen hoogtes? Wat is de maximale hoogte die jij aandurft? Ga je nodig hebben als het zover is.' },
+  { key: 'VOC', name: 'Timo',   date: '7 mei',  dateObj: '2026-05-07', task: 'Limburgs volkslied (zang)', attribute: 'Vocaal Vermogen', section: 'pre',
+    message: 'Pat, ken jij de tekst van het Limburgs volkslied uit je hoofd? Stuur een spraakbericht waarin je het zingt. Ga je nodig hebben als het zover is.' },
+  { key: 'DUR', name: 'Yoram',  date: '10 mei', dateObj: '2026-05-10', task: '5x KOEKOEK uit het raam', attribute: 'Onderscheidingen', section: 'pre',
+    message: 'Patrick, om 21:00 vanavond even 5x \'KOEKOEK\' uit je raam roepen. Stuur videobewijs. Ga je nodig hebben als het zover is.' },
+  { key: 'SWG', name: 'Kay',    date: '12 mei', dateObj: '2026-05-12', task: 'Bronstig liedje + tas inpakken', attribute: 'Soundtrack & Reisbereidheid', section: 'pre',
+    message: 'Yo, stuur me een liedje waar jij altijd bronstig van wordt. Luister naar dit liedje terwijl je een tas inpakt voor nachtje weg, zorg dat je \'m uiterlijk vrijdag gereed hebt. Filmpje van dit tafereel is extra punten. Ga je nodig hebben als het zover is.' },
+  { key: 'CAF', name: 'David',  date: '15 mei', dateObj: '2026-05-15', task: 'Barista-monoloog', attribute: 'Specialisatie', section: 'pre',
+    message: 'Patrick, maak een videobericht met een uitgebreid relaas over koffie, welke soorten er zijn, hoe belangrijk bereiding is, etc. Kortom, laat blijken dat jij een echte barrista bent. Italiaans accent is extra punten. Ga je nodig hebben als het zover is.' },
+  { key: 'PUZ', name: 'Rocco',  date: '18 mei', dateObj: '2026-05-18', task: 'Legpuzzel in 1x afmaken', attribute: 'Doorzettingsvermogen', section: 'pre',
+    message: 'Pak de eerste de beste legpuzzel uit de kast en maak \'m in 1x af. Stuur foto\'s van je voortgang (hulp van Frauke is toegestaan). Ga je nodig hebben als het zover is.' },
+  { key: 'IQ',  name: 'Dennis', date: '20 mei', dateObj: '2026-05-20', task: 'Neil deGrasse Tyson uitleg', attribute: 'IQ-rating', section: 'pre',
+    message: 'Leg in je eigen worden in een video uit waar Neil deGrasse Tyson bekend van is en neem ons mee in een beknopte (max 5 min) reis door tijd en ruimte. Ga je nodig hebben als het zover is.' },
+  { key: 'SQD', name: 'Niels',  date: '22 mei', dateObj: '2026-05-22', task: 'Vrienden in 1 woord beschrijven', attribute: 'Vriendennetwerk', section: 'pre',
+    message: 'Beschrijf alle genodigden van jouw vrijgezellenfeest in 1 woord waarom deze persoon onmisbaar is op jouw feestje en neem een video op waarin je achter elkaar de naam vd persoon en het woord noemt.' },
+  // === Bachelor weekend ===
+  { key: 'BLD', name: 'Crew',   date: '23 mei', dateObj: '2026-05-23', task: '🛠️ Bouw Challenge', attribute: 'Constructievaardigheid', section: 'weekend',
+    message: 'Bouw Challenge — uitleg volgt op de dag zelf.' },
+  { key: 'HIK', name: 'Crew',   date: '23 mei', dateObj: '2026-05-23', task: '🥾 Hike Challenge', attribute: 'Uithoudingsvermogen', section: 'weekend',
+    message: 'Hike Challenge — uitleg volgt op de dag zelf.' },
+  { key: 'SNG', name: 'Crew',   date: '23 mei', dateObj: '2026-05-23', task: '🎤 Zing Challenge', attribute: 'Performance', section: 'weekend',
+    message: 'Zing Challenge — uitleg volgt op de dag zelf.' },
+  { key: 'MJ',  name: 'Crew',   date: '23 mei', dateObj: '2026-05-23', task: '🕺 Michael Jackson Challenge', attribute: 'Dansvermogen', section: 'weekend',
+    message: 'Michael Jackson Challenge — uitleg volgt op de dag zelf.' },
+  { key: 'RNG', name: 'Crew',   date: '23 mei', dateObj: '2026-05-23', task: '💍 Ring Challenge', attribute: 'Precisie', section: 'weekend',
+    message: 'Ring Challenge — uitleg volgt op de dag zelf.' },
+];
+
+let scores = {};
+let uploads = {};
+let released = {};
+let scorePublished = {};
+let goldOverrideUsed = false;
+let db = null;
+let currentRole = null; // 'crew' | 'patrick' | null
+let currentCrewId = localStorage.getItem('crewId') || null;
+
+// --- Score helpers (handle both old number format and new {id: score} object format) ---
+function scoreValuesArray(opScores) {
+  if (opScores == null) return [];
+  if (typeof opScores === 'number') return [opScores];
+  return Object.values(opScores).filter(v => typeof v === 'number');
+}
+function getAverage(key) {
+  const arr = scoreValuesArray(scores[key]);
+  if (arr.length === 0) return null;
+  return Math.round(arr.reduce((a, b) => a + b, 0) / arr.length);
+}
+function getPublishedAverage(key) {
+  if (!scorePublished[key]) return null;
+  return getAverage(key);
+}
+function getMyScore(key) {
+  const opScores = scores[key];
+  if (opScores == null) return null;
+  if (typeof opScores === 'number') return null; // old data, can't tell whose
+  return opScores[currentCrewId] ?? null;
+}
+function getVoteCount(key) {
+  return scoreValuesArray(scores[key]).length;
+}
+
+// --- Init Firebase ---
+try {
+  const app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  onSnapshot(doc(db, "bachelor", "patrick"), (snap) => {
+    if (snap.exists()) {
+      const d = snap.data();
+      scores = d.scores || {};
+      uploads = d.uploads || {};
+      released = d.released || {};
+      scorePublished = d.scorePublished || {};
+      goldOverrideUsed = d.goldOverrideUsed === true;
+    } else {
+      scores = {}; uploads = {}; released = {}; scorePublished = {}; goldOverrideUsed = false;
+    }
+    render();
+  }, (err) => {
+    console.error(err);
+    showWarn('Fout bij verbinden met Firebase: ' + err.message);
+  });
+} catch (e) {
+  showWarn('Firebase fout: ' + e.message);
+}
+
+function showWarn(msg) {
+  const w = document.getElementById('config-warn');
+  w.style.display = 'block';
+  w.textContent = '⚠️ ' + msg;
+}
+
+async function saveData(newScores, newUploads, newReleased, newOverride, newPublished) {
+  if (!db) return;
+  try {
+    await setDoc(doc(db, "bachelor", "patrick"), {
+      scores: newScores ?? scores,
+      uploads: newUploads ?? uploads,
+      released: newReleased ?? released,
+      goldOverrideUsed: newOverride ?? goldOverrideUsed,
+      scorePublished: newPublished ?? scorePublished
+    });
+    setStatus('✓ Opgeslagen', 'ok');
+    setTimeout(() => setStatus(''), 2000);
+  } catch (e) {
+    setStatus('✗ Opslaan mislukt: ' + e.message, 'err');
+  }
+}
+
+async function togglePublished(key) {
+  if (!ADMIN_IDS.includes(currentCrewId)) {
+    setStatus('Alleen René en Niels kunnen scores vrijgeven', 'err');
+    setTimeout(() => setStatus(''), 3000);
+    return;
+  }
+  const newPublished = { ...scorePublished };
+  newPublished[key] = !newPublished[key];
+  scorePublished = newPublished;
+  await saveData(scores, uploads, released, goldOverrideUsed, newPublished);
+}
+
+async function useGoldOverride() {
+  if (!OVERRIDE_CREW_IDS.includes(currentCrewId)) {
+    setStatus('Alleen René of Niels kan de Gold Override gebruiken', 'err');
+    setTimeout(() => setStatus(''), 3000);
+    return;
+  }
+  goldOverrideUsed = !goldOverrideUsed;
+  await saveData(scores, uploads, released, goldOverrideUsed);
+}
+
+// Calculate earned and max with multipliers + override
+function calcEarned(opdrachten) {
+  const base = opdrachten
+    .filter(o => getPublishedAverage(o.key) != null)
+    .reduce((s, o) => s + getPublishedAverage(o.key) * getMultiplier(o), 0);
+  return goldOverrideUsed ? Math.max(base, OVERRIDE_POINTS) : base;
+}
+function calcMax(opdrachten) {
+  return opdrachten.reduce((s, o) => s + 100 * getMultiplier(o), 0);
+}
+
+async function saveMyScore(key, value) {
+  if (!currentCrewId) return;
+  const newScores = { ...scores };
+  // Migrate old number format to object
+  if (typeof newScores[key] === 'number' || newScores[key] == null) {
+    newScores[key] = {};
+  } else {
+    newScores[key] = { ...newScores[key] };
+  }
+  if (value === null) {
+    delete newScores[key][currentCrewId];
+    if (Object.keys(newScores[key]).length === 0) delete newScores[key];
+  } else {
+    newScores[key][currentCrewId] = value;
+  }
+  scores = newScores;
+  await saveData(newScores, uploads, released);
+}
+
+async function toggleRelease(key) {
+  if (!ADMIN_IDS.includes(currentCrewId)) {
+    setStatus('Alleen René en Niels kunnen opdrachten zichtbaar maken', 'err');
+    setTimeout(() => setStatus(''), 3000);
+    return;
+  }
+  const newReleased = { ...released };
+  newReleased[key] = !newReleased[key];
+  released = newReleased;
+  await saveData(scores, uploads, newReleased);
+}
+
+async function removeUpload(opdrachtKey, uploadIndex) {
+  if (!confirm('Deze upload verwijderen?')) return;
+  const newUploads = { ...uploads };
+  if (!newUploads[opdrachtKey]) return;
+  newUploads[opdrachtKey] = [...newUploads[opdrachtKey]];
+  newUploads[opdrachtKey].splice(uploadIndex, 1);
+  if (newUploads[opdrachtKey].length === 0) delete newUploads[opdrachtKey];
+  uploads = newUploads;
+  await saveData(scores, newUploads, released, goldOverrideUsed);
+}
+
+async function uploadFile(file, opdrachtKey, progressEl) {
+  if (CLOUDINARY_CLOUD_NAME === "PASTE_HIER_CLOUD_NAME") {
+    throw new Error('Cloudinary niet geconfigureerd');
+  }
+  const isImage = file.type.startsWith('image/');
+  const resourceType = isImage ? 'image' : 'video';
+  const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`;
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && progressEl) {
+        progressEl.style.width = (e.loaded / e.total * 100) + '%';
+      }
+    };
+    xhr.onload = async () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const result = JSON.parse(xhr.responseText);
+        const fileUrl = result.secure_url;
+        const newUploads = { ...uploads };
+        if (!newUploads[opdrachtKey]) newUploads[opdrachtKey] = [];
+        newUploads[opdrachtKey].push({
+          url: fileUrl, name: file.name, type: file.type, time: Date.now()
+        });
+        uploads = newUploads;
+        await saveData(scores, newUploads, released);
+        resolve(fileUrl);
+      } else {
+        reject(new Error('Upload mislukt: ' + xhr.responseText));
+      }
+    };
+    xhr.onerror = () => reject(new Error('Netwerkfout bij uploaden'));
+    xhr.send(formData);
+  });
+}
+
+function setStatus(msg, type) {
+  const id = currentRole === 'crew' ? 'crew-status' : 'patrick-status';
+  const el = document.getElementById(id);
+  if (el) {
+    el.textContent = msg;
+    el.className = 'status ' + (type || '');
+  }
+}
+
+// --- Release helpers ---
+function isReleased(opdracht) {
+  return released[opdracht.key] === true;
+}
+
+// --- Render Card (always) ---
+function renderCard() {
+  // Patrick en pre-login zien alleen released opdrachten. Crew ziet alles.
+  const visibleOpdrachten = currentRole === 'crew'
+    ? OPDRACHTEN
+    : OPDRACHTEN.filter(o => isReleased(o));
+
+  const completed = visibleOpdrachten.filter(o => getAverage(o.key) != null);
+  const earnedTotal = calcEarned(visibleOpdrachten);
+  const maxTotal = calcMax(visibleOpdrachten);
+  // LV = percentage of max achieved (0-100)
+  const ovr = maxTotal > 0 && completed.length > 0 ? Math.round((earnedTotal / maxTotal) * 100) : 0;
+  const totalVisible = visibleOpdrachten.length;
+  // Hartjes: starten vol (5) en gaan naar 0 naarmate alle opdrachten zijn voltooid.
+  // Past bij het thema — Patrick's vrijgezellenleven loopt af.
+  const heartCount = totalVisible > 0
+    ? Math.max(0, 5 - Math.round((completed.length / totalVisible) * 5))
+    : 5;
+  const stamPct = totalVisible > 0 ? (completed.length / totalVisible) * 100 : 0;
+
+  document.getElementById('ovr-badge').textContent = 'LV ' + (ovr || '??');
+
+  const heartsEl = document.getElementById('hearts');
+  heartsEl.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const filled = i < heartCount;
+    heartsEl.innerHTML += `<svg class="heart" viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9-9c-1-2.5 0-6 3.5-6.5 2-0.3 4 0.7 5.5 2.5 1.5-1.8 3.5-2.8 5.5-2.5C20 6 21 9.5 20 12c-2 4.5-9 9-9 9z" fill="${filled ? '#e84838' : 'rgba(255,255,255,0.2)'}" stroke="#1a1410" stroke-width="1.5"/></svg>`;
+  }
+
+  const dash = (stamPct / 100) * 81.6;
+  document.getElementById('stamina').innerHTML = `
+    <svg viewBox="0 0 40 40">
+      <circle cx="20" cy="20" r="16" fill="rgba(0,0,0,0.4)" stroke="#1a1410" stroke-width="2"/>
+      <circle cx="20" cy="20" r="13" fill="none" stroke="#98e858" stroke-width="5"
+              stroke-dasharray="${dash} 100" transform="rotate(-90 20 20)" stroke-linecap="round"/>
+      <circle cx="20" cy="20" r="5" fill="#98e858" stroke="#1a1410" stroke-width="1.5"/>
+      <text x="20" y="24" text-anchor="middle" font-size="9" font-weight="bold" fill="#1a1410" font-family="'Press Start 2P', monospace">${completed.length}</text>
+    </svg>`;
+
+  const grid = document.getElementById('stats-grid');
+  grid.innerHTML = '';
+
+  if (visibleOpdrachten.length === 0) {
+    grid.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--parchment-2); font-style: italic;">Nog niks om te zien…</div>`;
+    return;
+  }
+
+  ATTRIBUTES.forEach(attr => {
+    const score = getAttributeScore(attr, visibleOpdrachten);
+    const has = score != null;
+    const fillPct = has ? score : 0;
+    grid.innerHTML += `
+      <div class="attr-row">
+        <div class="attr-icon">${attr.icon}</div>
+        <div class="attr-info">
+          <div class="attr-name">${attr.name}</div>
+          <div class="attr-desc">${attr.desc}</div>
+          <div class="attr-bar"><div class="attr-bar-fill" style="width:${fillPct}%"></div></div>
+        </div>
+        <div class="attr-score ${has ? '' : 'empty'}">${has ? score : '??'}</div>
+      </div>`;
+  });
+}
+
+// --- Render Crew Score Panel ---
+function renderCrewPanel() {
+  // Total progress with multipliers
+  const earned = calcEarned(OPDRACHTEN);
+  const max = calcMax(OPDRACHTEN);
+  const pct = (earned / max) * 100;
+  document.getElementById('crew-progress-fill').style.width = Math.min(100, pct) + '%';
+  document.getElementById('crew-progress-label').textContent = `${earned} / ${max} punten (drempel ${STRIPPER_THRESHOLD})`;
+
+  // Override toggle voor René en Niels
+  const overrideBox = document.getElementById('crew-override');
+  if (overrideBox) {
+    if (OVERRIDE_CREW_IDS.includes(currentCrewId)) {
+      overrideBox.innerHTML = goldOverrideUsed
+        ? `<button class="gold-override-btn active" id="crew-override-btn">⚡ GOLD OVERRIDE: AAN ⚡ — klik om uit te zetten</button>`
+        : `<button class="gold-override-btn" id="crew-override-btn">⚡ GOLD OVERRIDE: UIT — klik om aan te zetten ⚡</button>`;
+      document.getElementById('crew-override-btn').addEventListener('click', useGoldOverride);
+    } else {
+      overrideBox.innerHTML = goldOverrideUsed
+        ? `<div class="override-used">★ GOLD OVERRIDE STAAT AAN ★</div>`
+        : '';
+    }
+  }
+
+  const list = document.getElementById('score-list');
+  list.innerHTML = '';
+  let lastSection = null;
+  OPDRACHTEN.forEach(o => {
+    if (o.section !== lastSection) {
+      const header = document.createElement('div');
+      header.style.cssText = 'font-family: \'Press Start 2P\', monospace; font-size: 9px; color: var(--gold); letter-spacing: 0.1em; margin: 12px 0 6px;';
+      header.textContent = o.section === 'pre' ? '◆ AANLOOP ◆' : '◆ FINALE ◆';
+      list.appendChild(header);
+      lastSection = o.section;
+    }
+    const myScore = getMyScore(o.key);
+    const avg = getAverage(o.key);
+    const voteCount = getVoteCount(o.key);
+    const isPublished = scorePublished[o.key] === true;
+    const opUploads = uploads[o.key] || [];
+    const isReleasedBool = released[o.key] === true;
+    const isAdmin = ADMIN_IDS.includes(currentCrewId);
+    const releaseHtml = isAdmin
+      ? `<button class="release-btn ${isReleasedBool ? 'released' : ''}" data-toggle-release="${o.key}">
+           ${isReleasedBool ? '👁 Zichtbaar voor Patrick' : '🚫 Nog verborgen'}
+         </button>`
+      : `<span class="release-status ${isReleasedBool ? 'released' : ''}">
+           ${isReleasedBool ? '👁 Zichtbaar voor Patrick' : '🚫 Nog verborgen'}
+         </span>`;
+    const publishHtml = voteCount > 0
+      ? (isAdmin
+          ? `<button class="publish-btn ${isPublished ? 'published' : ''}" data-toggle-publish="${o.key}">
+               ${isPublished ? '✓ Score vrijgegeven' : '⏳ Score nog niet vrij'}
+             </button>`
+          : `<span class="release-status ${isPublished ? 'released' : ''}">
+               ${isPublished ? '✓ Score vrijgegeven' : '⏳ Score nog niet vrij'}
+             </span>`)
+      : '';
+    const row = document.createElement('div');
+    row.className = 'score-row' + (isPublished ? ' has-score' : '') + (opUploads.length ? ' has-upload' : '');
+    row.innerHTML = `
+      <span class="key">${o.key}${o.section === 'weekend' ? ' <span style="color:#ff7a1a; font-size:8px;">×3</span>' : ''}</span>
+      <div class="meta">
+        <b>${o.name}</b> <span class="dt">· ${o.date}</span>
+        <span class="attr-meta">⚡ ${o.attribute}</span>
+        <span class="tk">${o.task}</span>
+        <details class="message-collapse small">
+          <summary>📜 Bericht</summary>
+          <div class="quest-message">${o.message}</div>
+        </details>
+        ${releaseHtml}
+        ${publishHtml}
+        ${voteCount > 0 ? `<span class="avg-display">★ Gem: <b>${avg}</b>${o.section === 'weekend' ? ` → <b>${avg*3}</b> punten (×3)` : ''} (${voteCount}/${CREW_MEMBERS.length} stemmen)</span>` : ''}
+        ${opUploads.length ? `<span class="uploads-count">📎 ${opUploads.length} upload${opUploads.length > 1 ? 's' : ''}</span>` : ''}
+      </div>
+      <input type="number" min="0" max="100" class="score" value="${myScore != null ? myScore : ''}" placeholder="—" data-key="${o.key}" title="Jouw score (0-100)"/>
+      <button class="btn-small" data-clear="${o.key}">Wis mijn</button>
+      ${opUploads.length ? `<div class="uploads-preview">${opUploads.map((u, i) => renderUploadPreview(u, o.key, i, true)).join('')}</div>` : ''}
+    `;
+    list.appendChild(row);
+  });
+
+  list.querySelectorAll('input.score').forEach(input => {
+    input.addEventListener('blur', (e) => {
+      const k = e.target.dataset.key;
+      const v = e.target.value;
+      if (v === '') saveMyScore(k, null);
+      else saveMyScore(k, Math.max(0, Math.min(100, parseInt(v) || 0)));
+    });
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.target.blur(); });
+  });
+  list.querySelectorAll('[data-clear]').forEach(btn => {
+    btn.addEventListener('click', () => saveMyScore(btn.dataset.clear, null));
+  });
+  list.querySelectorAll('[data-toggle-release]').forEach(btn => {
+    btn.addEventListener('click', () => toggleRelease(btn.dataset.toggleRelease));
+  });
+  list.querySelectorAll('[data-toggle-publish]').forEach(btn => {
+    btn.addEventListener('click', () => togglePublished(btn.dataset.togglePublish));
+  });
+  list.querySelectorAll('[data-view-upload]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const url = el.dataset.viewUpload;
+      const type = el.dataset.viewType;
+      openModal(url, type);
+    });
+  });
+}
+
+function renderUploadPreview(u, key, idx, clickable) {
+  const isImg = u.type && u.type.startsWith('image/');
+  const isVid = u.type && u.type.startsWith('video/');
+  if (isImg) {
+    return `<img src="${u.url}" data-view-upload="${u.url}" data-view-type="image" alt="${u.name}" />`;
+  }
+  if (isVid) {
+    return `<video src="${u.url}" data-view-upload="${u.url}" data-view-type="video" muted></video>`;
+  }
+  return `<a href="${u.url}" target="_blank" class="file-link">📄 ${u.name}</a>`;
+}
+
+function openModal(url, type) {
+  const modal = document.getElementById('upload-modal');
+  const content = document.getElementById('modal-content');
+  if (type === 'video') {
+    content.innerHTML = `<video src="${url}" controls autoplay style="max-width:90vw; max-height:80vh;"></video>`;
+  } else {
+    content.innerHTML = `<img src="${url}" style="max-width:90vw; max-height:80vh;" />`;
+  }
+  modal.style.display = 'flex';
+}
+
+document.getElementById('modal-close').addEventListener('click', () => {
+  document.getElementById('upload-modal').style.display = 'none';
+  document.getElementById('modal-content').innerHTML = '';
+});
+document.getElementById('upload-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'upload-modal') {
+    document.getElementById('upload-modal').style.display = 'none';
+    document.getElementById('modal-content').innerHTML = '';
+  }
+});
+
+// --- Render Patrick Panel ---
+function renderPatrickPanel() {
+  // Patrick ziet alleen released opdrachten
+  const visibleOpdrachten = OPDRACHTEN.filter(o => isReleased(o));
+  const completed = visibleOpdrachten.filter(o => getPublishedAverage(o.key) != null);
+  const earned = calcEarned(visibleOpdrachten);
+  const max = calcMax(visibleOpdrachten);
+  const pct = max > 0 ? Math.min(100, (earned / max) * 100) : 0;
+  document.getElementById('patrick-progress-fill').style.width = pct + '%';
+  document.getElementById('patrick-progress-label').textContent = max > 0 ? `${earned} / ${max} punten` : 'Nog geen opdrachten';
+
+  // Motiverende banner — geen drempels of stripper info, alleen aanmoediging
+  const bannerEl = document.getElementById('patrick-banner');
+  bannerEl.innerHTML = `
+    <div class="urgency-banner">
+      <div class="urgency-title">⚔ ELKE PUNT TELT ⚔</div>
+      <div class="urgency-body">
+        Hoe meer punten je verzamelt, hoe groter de beloning op het moment suprême.
+        <br><br>
+        <b>Geef alles. Geen halve maatregelen.</b>
+      </div>
+    </div>`;
+
+  const container = document.getElementById('patrick-quests');
+  container.innerHTML = '';
+
+  // Active quests: released + not yet published
+  const activeQuests = OPDRACHTEN.filter(o => isReleased(o) && getPublishedAverage(o.key) == null);
+  const uploadedNotScored = activeQuests.filter(o => uploads[o.key] && uploads[o.key].length > 0);
+  const noUpload = activeQuests.filter(o => !uploads[o.key] || uploads[o.key].length === 0);
+
+  if (activeQuests.length === 0) {
+    container.innerHTML = `
+      <div class="no-quest">
+        <h3>Geen actieve opdracht</h3>
+        <p>Wacht maar af. Er komt zo iets je kant op…</p>
+      </div>`;
+    return;
+  }
+
+  // Render no-upload first
+  noUpload.forEach(o => container.appendChild(buildQuestCard(o, 'todo')));
+  uploadedNotScored.forEach(o => container.appendChild(buildQuestCard(o, 'uploaded')));
+}
+
+function buildQuestCard(o, state) {
+  const div = document.createElement('div');
+  div.className = 'patrick-quest';
+  const opUploads = uploads[o.key] || [];
+
+  let statusHtml = '';
+  if (state === 'todo') {
+    statusHtml = `
+      <div class="quest-status">
+        <span class="lbl">► STATUS</span>
+        Aan jou. Upload bewijs (foto of video) hieronder.
+      </div>`;
+  } else if (state === 'uploaded') {
+    statusHtml = `
+      <div class="quest-status uploaded">
+        <span class="lbl">⏳ INGELEVERD</span>
+        Bewijs ontvangen. De crew bekijkt en beoordeelt 'm. Je kunt nog meer toevoegen.
+      </div>`;
+  }
+
+  div.innerHTML = `
+    <div class="quest-tag">${o.section === 'pre' ? 'OPDRACHT' : 'FINALE'} · ${o.attribute}</div>
+    <div class="quest-key">${o.key}</div>
+    <div class="quest-from">📩 OPDRACHTGEVER: <b>${o.name}</b></div>
+    <details class="message-collapse">
+      <summary>📜 Bekijk het bericht</summary>
+      <div class="quest-message">${o.message}</div>
+    </details>
+    ${statusHtml}
+    ${opUploads.length ? `
+      <div style="margin-top: 12px;">
+        <div style="font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--gold); margin-bottom: 6px;">JOUW UPLOADS</div>
+        <div class="uploaded-files">
+          ${opUploads.map((u, idx) => {
+            const isImg = u.type && u.type.startsWith('image/');
+            const isVid = u.type && u.type.startsWith('video/');
+            let inner = '';
+            if (isImg) inner = `<img src="${u.url}"/>`;
+            else if (isVid) inner = `<video src="${u.url}" muted></video>`;
+            else inner = `<div class="file-icon">📄</div>`;
+            return `<div class="preview">${inner}<button class="del-upload" data-del-key="${o.key}" data-del-idx="${idx}" title="Verwijder">✕</button></div>`;
+          }).join('')}
+        </div>
+      </div>
+    ` : ''}
+    <div class="upload-zone" data-key="${o.key}">
+      <input type="file" accept="image/*,video/*" multiple/>
+      <p>📤 UPLOAD BEWIJS</p>
+      <span>Klik of sleep foto/video hierheen</span>
+      <div class="upload-progress" style="display:none;"><div class="bar"></div></div>
+    </div>
+    <details class="upload-tips">
+      <summary>📱 Tips voor iPhone (max 100 MB per bestand)</summary>
+      <div class="tips-content">
+        <p><b>Foto's:</b> altijd OK, gewoon kiezen uit Foto's app of direct met camera.</p>
+        <p><b>Video's — let op de lengte:</b></p>
+        <ul>
+          <li>1080p 30fps (standaard) → <b>max ~1,5 minuut</b></li>
+          <li>720p 30fps (HD) → <b>max ~3 minuten</b></li>
+          <li>4K → <b>max ~14 seconden</b> (afraden)</li>
+        </ul>
+        <p><b>Te lange video?</b> Open 'm in Foto's app → Bewerken → schuif de gele balkjes om in te korten → Bewaar.</p>
+        <p><b>Camera-instelling aanpassen:</b> Instellingen → Camera → Video opnemen → kies <b>1080p HD bij 30 fps</b> voor kleinere bestanden.</p>
+        <p style="color: var(--gold); font-weight: bold;">⚠️ Bestanden groter dan 100 MB worden geweigerd.</p>
+      </div>
+    </details>
+  `;
+
+  // Hook up upload zone
+  const zone = div.querySelector('.upload-zone');
+  const input = zone.querySelector('input[type=file]');
+  const progressBox = zone.querySelector('.upload-progress');
+  const progressBar = progressBox.querySelector('.bar');
+
+  zone.addEventListener('click', (e) => {
+    if (e.target.tagName !== 'INPUT') input.click();
+  });
+  zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    zone.classList.remove('drag');
+    if (e.dataTransfer.files.length) {
+      await handleFiles(e.dataTransfer.files, o.key, progressBox, progressBar);
+    }
+  });
+  input.addEventListener('change', async (e) => {
+    if (e.target.files.length) {
+      await handleFiles(e.target.files, o.key, progressBox, progressBar);
+    }
+  });
+
+  // Hook up delete buttons on uploads
+  div.querySelectorAll('[data-del-key]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const k = btn.dataset.delKey;
+      const idx = parseInt(btn.dataset.delIdx);
+      removeUpload(k, idx);
+    });
+  });
+
+  return div;
+}
+
+async function handleFiles(fileList, key, progressBox, progressBar) {
+  // Check file sizes first
+  const tooBig = [];
+  for (const file of fileList) {
+    if (file.size > MAX_UPLOAD_BYTES) {
+      const mb = (file.size / 1024 / 1024).toFixed(0);
+      tooBig.push(`${file.name} (${mb} MB)`);
+    }
+  }
+  if (tooBig.length) {
+    alert(
+      `❌ Te groot voor upload (max 100 MB):\n\n` +
+      tooBig.join('\n') +
+      `\n\nWat te doen?\n\n` +
+      `• Open de video in Foto's-app\n` +
+      `• Tik op Bewerken (rechtsboven)\n` +
+      `• Schuif de gele balkjes om in te korten\n` +
+      `• Tik op Bewaar\n\n` +
+      `Of zet je camera op 1080p 30fps in Instellingen.`
+    );
+    return;
+  }
+  progressBox.style.display = 'block';
+  setStatus('Uploaden...');
+  for (const file of fileList) {
+    try {
+      progressBar.style.width = '0%';
+      await uploadFile(file, key, progressBar);
+    } catch (e) {
+      setStatus('Upload mislukt: ' + e.message, 'err');
+      progressBox.style.display = 'none';
+      return;
+    }
+  }
+  progressBox.style.display = 'none';
+  setStatus('✓ Geüpload', 'ok');
+  setTimeout(() => setStatus(''), 2000);
+}
+
+// --- Login Logic ---
+function render() {
+  const panel = document.querySelector('.stats-panel');
+  if (currentRole) {
+    panel.classList.add('visible');
+  } else {
+    panel.classList.remove('visible');
+  }
+  renderCard();
+  if (currentRole === 'crew') {
+    renderCrewPanel();
+  } else if (currentRole === 'patrick') {
+    renderPatrickPanel();
+  }
+}
+
+document.getElementById('lock-btn-crew').addEventListener('click', logout);
+document.getElementById('lock-btn-patrick').addEventListener('click', logout);
+
+// Initial bind
+resetLoginPanel();
+
+function tryLogin() {
+  const input = document.getElementById('pin-input');
+  const val = input.value.trim().toUpperCase();
+  if (val === CREW_PIN) {
+    currentRole = 'crew';
+    input.value = '';
+    if (!currentCrewId) {
+      // Show identity selector
+      showCrewIdentitySelector();
+    } else {
+      enterCrewMode();
+    }
+  } else if (val === PATRICK_PIN) {
+    currentRole = 'patrick';
+    document.getElementById('login-panel').style.display = 'none';
+    document.getElementById('crew-panel').style.display = 'none';
+    document.getElementById('patrick-panel').style.display = 'block';
+    document.getElementById('tagline').textContent = 'Welkom Patje. Voer je opdracht uit en upload bewijs.';
+    input.value = '';
+    render();
+  } else {
+    input.classList.add('error');
+    setTimeout(() => input.classList.remove('error'), 500);
+    showSnoopWarning();
+    logSnoopAttempt(val);
+  }
+}
+
+function showSnoopWarning() {
+  const taunts = [
+    "👀 Niet zo nieuwsgierig, Patje. Jouw PIN is PATJE.",
+    "🚨 Betrapt! Probeer 'PATJE' eens.",
+    "😏 De crew houdt zijn geheimen voor zich. PIN = PATJE.",
+    "🕵️ Snoeperd. Jij krijgt PATJE — daar moet je het mee doen.",
+    "⚠️ Mooie poging. Niet vandaag, kampioen. PIN = PATJE."
+  ];
+  const msg = taunts[Math.floor(Math.random() * taunts.length)];
+  let warn = document.getElementById('snoop-warning');
+  if (!warn) {
+    warn = document.createElement('div');
+    warn.id = 'snoop-warning';
+    warn.className = 'snoop-warning';
+    document.getElementById('login-panel').appendChild(warn);
+  }
+  warn.textContent = msg;
+  warn.classList.remove('show');
+  void warn.offsetWidth; // force reflow
+  warn.classList.add('show');
+  clearTimeout(warn._timer);
+  warn._timer = setTimeout(() => warn.classList.remove('show'), 6000);
+}
+
+async function logSnoopAttempt(attempt) {
+  if (!db) return;
+  try {
+    const snap = await getDoc(doc(db, "bachelor", "patrick"));
+    const existing = snap.exists() ? (snap.data().snoopAttempts || []) : [];
+    existing.push({ attempt: String(attempt).slice(0, 20), time: Date.now() });
+    // Bewaar laatste 50
+    const trimmed = existing.slice(-50);
+    await setDoc(doc(db, "bachelor", "patrick"), {
+      scores: scores,
+      uploads: uploads,
+      released: released,
+      goldOverrideUsed: goldOverrideUsed,
+      scorePublished: scorePublished,
+      snoopAttempts: trimmed
+    });
+  } catch (e) { /* stil falen */ }
+}
+
+function showCrewIdentitySelector() {
+  const panel = document.getElementById('login-panel');
+  panel.innerHTML = `
+    <div style="font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--gold); margin-bottom: 10px; letter-spacing: 0.1em;">
+      ★ WIE BEN JE? ★
+    </div>
+    <div class="login-box">
+      <select id="crew-id-select" style="flex:1; padding: 8px; background: rgba(0,0,0,0.4); color: var(--parchment); border: 1px solid var(--gold); border-radius: 4px; font-family: 'Cormorant Garamond', serif; font-size: 14px;">
+        <option value="">-- kies je naam --</option>
+        ${CREW_MEMBERS.map(m => `<option value="${m.id}">${m.name}</option>`).join('')}
+      </select>
+      <button class="btn-primary" id="confirm-crew-id">Bevestig</button>
+    </div>
+    <div class="info" style="margin-top:10px; margin-bottom:0;">Eenmalig, daarna onthoudt deze browser jouw keuze.</div>
+  `;
+  document.getElementById('confirm-crew-id').addEventListener('click', () => {
+    const sel = document.getElementById('crew-id-select');
+    if (!sel.value) return;
+    currentCrewId = sel.value;
+    localStorage.setItem('crewId', currentCrewId);
+    enterCrewMode();
+  });
+}
+
+function enterCrewMode() {
+  // Restore login panel HTML in case it was replaced
+  resetLoginPanel();
+  document.getElementById('login-panel').style.display = 'none';
+  document.getElementById('crew-panel').style.display = 'block';
+  document.getElementById('patrick-panel').style.display = 'none';
+  const member = CREW_MEMBERS.find(m => m.id === currentCrewId);
+  document.getElementById('crew-identity').innerHTML = `Ingelogd als <b>${member ? member.name : '?'}</b> · <a href="#" id="switch-user" style="color:var(--gold); text-decoration:underline;">wissel</a>`;
+  document.getElementById('switch-user').addEventListener('click', (e) => {
+    e.preventDefault();
+    currentCrewId = null;
+    localStorage.removeItem('crewId');
+    document.getElementById('crew-panel').style.display = 'none';
+    document.getElementById('login-panel').style.display = 'block';
+    showCrewIdentitySelector();
+  });
+  document.getElementById('tagline').textContent = 'Crew mode. Score vrijuit. Patrick logt in met zijn eigen PIN.';
+  render();
+}
+
+function resetLoginPanel() {
+  const panel = document.getElementById('login-panel');
+  panel.innerHTML = `
+    <div class="login-box">
+      <span style="color: var(--gold); font-size: 14px;">🔒</span>
+      <input type="password" id="pin-input" placeholder="PIN" autocomplete="off"/>
+      <button class="btn-primary" id="pin-btn">Login</button>
+    </div>
+    <div class="info" style="margin-top: 10px; margin-bottom: 0;">
+      Crew of Patrick? Voer je PIN in.
+    </div>
+  `;
+  document.getElementById('pin-btn').addEventListener('click', tryLogin);
+  document.getElementById('pin-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') tryLogin();
+  });
+}
+
+function logout() {
+  currentRole = null;
+  resetLoginPanel();
+  document.getElementById('login-panel').style.display = 'block';
+  document.getElementById('crew-panel').style.display = 'none';
+  document.getElementById('patrick-panel').style.display = 'none';
+  document.getElementById('tagline').textContent = 'Deel deze link met de crew. Patrick krijgt een eigen PIN.';
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
