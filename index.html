@@ -1419,10 +1419,14 @@ function setStatus(msg, type) {
 }
 
 let celebrationFired = false;
+let celebrationGlowApplied = false;
 function triggerCelebration() {
-  // Permanent: champion frame glows extra
-  const frame = document.querySelector('.champion-frame');
-  if (frame) frame.classList.add('celebrating');
+  // Permanent: champion frame glows extra (only add class once)
+  if (!celebrationGlowApplied) {
+    const frame = document.querySelector('.champion-frame');
+    if (frame) frame.classList.add('celebrating');
+    celebrationGlowApplied = true;
+  }
 
   // One-shot: confetti + flash op het moment van overschrijden
   const seen = sessionStorage.getItem('celebrated2100');
@@ -1441,7 +1445,7 @@ function triggerCelebration() {
   container.className = 'confetti-container';
   document.body.appendChild(container);
   const colors = ['#ffd84a', '#ff7a1a', '#98e858', '#5fc8e0', '#e84838', '#fff8c8'];
-  for (let i = 0; i < 120; i++) {
+  for (let i = 0; i < 80; i++) {
     const piece = document.createElement('div');
     piece.className = 'confetti';
     piece.style.left = Math.random() * 100 + 'vw';
