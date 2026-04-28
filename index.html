@@ -350,6 +350,64 @@
     font-family: 'Cormorant Garamond', serif;
   }
   .avg-display b { color: white; font-size: 13px; }
+
+  .vote-breakdown {
+    display: block;
+    margin-top: 6px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255, 216, 74, 0.25);
+    border-radius: 4px;
+    padding: 0 10px;
+  }
+  .vote-breakdown summary {
+    cursor: pointer;
+    color: var(--gold);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    letter-spacing: 0.05em;
+    list-style: none;
+    padding: 6px 0;
+  }
+  .vote-breakdown summary::-webkit-details-marker { display: none; }
+  .vote-breakdown summary::before {
+    content: '▶ ';
+    display: inline-block;
+    transition: transform 0.2s;
+  }
+  .vote-breakdown[open] summary::before { transform: rotate(90deg); }
+  .vote-list {
+    padding: 4px 0 8px;
+    border-top: 1px solid rgba(255, 216, 74, 0.15);
+  }
+  .vote-section { margin-top: 6px; }
+  .vote-section-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+  .vote-section-title.voted { color: var(--green); }
+  .vote-section-title.not-voted { color: #e88848; }
+  .vote-row {
+    display: flex; justify-content: space-between;
+    padding: 3px 8px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 3px;
+    margin-bottom: 2px;
+    font-size: 12px;
+  }
+  .vote-name { color: var(--parchment); }
+  .vote-score {
+    color: white; font-weight: bold;
+    font-family: 'MedievalSharp', cursive;
+  }
+  .vote-pending {
+    font-size: 12px;
+    color: var(--parchment-2);
+    font-style: italic;
+    line-height: 1.4;
+    padding: 2px 4px;
+  }
   .score-row input.score {
     padding: 6px 8px; background: rgba(0,0,0,0.4);
     color: white; border: 1px solid var(--gold);
@@ -1752,6 +1810,7 @@ function renderCrewPanel() {
         ${releaseHtml}
         ${publishHtml}
         ${voteCount > 0 ? `<span class="avg-display">★ Gem: <b>${avg}</b>${o.section === 'weekend' ? ` → <b>${avg*3}</b> punten (×3)` : ''} (${voteCount}/${CREW_MEMBERS.length} stemmen)</span>` : ''}
+        ${isAdmin ? buildVoteBreakdown(o.key) : ''}
         ${opUploads.length ? `<span class="uploads-count">📎 ${opUploads.length} upload${opUploads.length > 1 ? 's' : ''}</span>` : ''}
       </div>
       <input type="number" min="0" max="100" class="score" value="${myScore != null ? myScore : ''}" placeholder="—" data-key="${o.key}" title="Jouw score (0-100)"/>
@@ -1787,6 +1846,41 @@ function renderCrewPanel() {
       openModal(url, type);
     });
   });
+}
+
+function buildVoteBreakdown(key) {
+  const opScores = scores[key];
+  const voted = [];
+  const notVoted = [];
+  CREW_MEMBERS.forEach(m => {
+    let s = null;
+    if (opScores && typeof opScores === 'object' && opScores[m.id] != null) {
+      s = opScores[m.id];
+    }
+    if (s != null) {
+      voted.push({ name: m.name, score: s });
+    } else {
+      notVoted.push(m.name);
+    }
+  });
+  return `
+    <details class="vote-breakdown">
+      <summary>👥 Wie heeft gestemd? (${voted.length}/${CREW_MEMBERS.length})</summary>
+      <div class="vote-list">
+        ${voted.length ? `
+          <div class="vote-section">
+            <div class="vote-section-title voted">✓ Gestemd:</div>
+            ${voted.map(v => `<div class="vote-row"><span class="vote-name">${v.name}</span><span class="vote-score">${v.score}</span></div>`).join('')}
+          </div>
+        ` : ''}
+        ${notVoted.length ? `
+          <div class="vote-section">
+            <div class="vote-section-title not-voted">⏳ Nog niet:</div>
+            <div class="vote-pending">${notVoted.join(' · ')}</div>
+          </div>
+        ` : ''}
+      </div>
+    </details>`;
 }
 
 function renderUploadPreview(u, key, idx, clickable) {
