@@ -1862,7 +1862,7 @@ async function saveData(newScores, newUploads, newReleased, newOverride, newPubl
     // Read current to preserve fields not being explicitly set
     const snap = await getDoc(doc(db, "bachelor", "patrick"));
     const existing = snap.exists() ? snap.data() : {};
-    await setDoc(doc(db, "bachelor", "patrick"), {
+    const payload = {
       scores: newScores ?? existing.scores ?? scores,
       uploads: newUploads ?? existing.uploads ?? uploads,
       released: newReleased ?? existing.released ?? released,
@@ -1871,10 +1871,14 @@ async function saveData(newScores, newUploads, newReleased, newOverride, newPubl
       scoreComments: newComments ?? existing.scoreComments ?? scoreComments,
       patrickLogins: existing.patrickLogins || patrickLogins || [],
       snoopAttempts: existing.snoopAttempts || []
-    });
+    };
+    console.log('[saveData] Writing to Firestore:', { scoreCommentsKeys: Object.keys(payload.scoreComments || {}), payload });
+    await setDoc(doc(db, "bachelor", "patrick"), payload);
+    console.log('[saveData] Firestore write successful');
     setStatus('✓ Opgeslagen', 'ok');
     setTimeout(() => setStatus(''), 2000);
   } catch (e) {
+    console.error('[saveData] FAILED:', e);
     setStatus('✗ Opslaan mislukt: ' + e.message, 'err');
   }
 }
@@ -1932,7 +1936,11 @@ async function saveMyScore(key, value) {
 }
 
 async function saveMyComment(key, text) {
-  if (!currentCrewId) return;
+  if (!currentCrewId) {
+    console.error('[saveMyComment] No crewId set!');
+    return;
+  }
+  console.log('[saveMyComment] Saving:', { key, text, crewId: currentCrewId });
   const newComments = { ...scoreComments };
   if (!newComments[key]) newComments[key] = {};
   else newComments[key] = { ...newComments[key] };
@@ -1942,8 +1950,10 @@ async function saveMyComment(key, text) {
     delete newComments[key][currentCrewId];
     if (Object.keys(newComments[key]).length === 0) delete newComments[key];
   }
+  console.log('[saveMyComment] New scoreComments object:', newComments);
   scoreComments = newComments;
   await saveData(scores, uploads, released, goldOverrideUsed, scorePublished, newComments);
+  console.log('[saveMyComment] Save call returned');
 }
 
 function getMyComment(key) {
