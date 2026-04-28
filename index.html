@@ -408,6 +408,65 @@
     line-height: 1.4;
     padding: 2px 4px;
   }
+  .vote-comment {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+    color: var(--parchment-2);
+    font-style: italic;
+    padding: 4px 12px 6px;
+    margin-bottom: 4px;
+    border-left: 2px solid var(--gold);
+    background: rgba(0,0,0,0.15);
+    margin-left: 8px;
+  }
+  .crew-comment-row {
+    grid-column: 1 / -1;
+    margin-top: 6px;
+  }
+  .crew-comment-input {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    color: var(--parchment);
+    border: 1px solid rgba(255, 216, 74, 0.3);
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    box-sizing: border-box;
+  }
+  .crew-comment-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: rgba(0,0,0,0.4);
+  }
+  .crew-comment-input::placeholder {
+    color: rgba(244, 228, 188, 0.4);
+    font-style: italic;
+  }
+  .crew-feedback {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(152, 232, 88, 0.3);
+  }
+  .crew-feedback-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: var(--green);
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+  .crew-feedback-item {
+    background: rgba(0,0,0,0.3);
+    border-left: 3px solid var(--green);
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    border-radius: 0 4px 4px 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--parchment);
+    line-height: 1.4;
+  }
   .score-row input.score {
     padding: 6px 8px; background: rgba(0,0,0,0.4);
     color: white; border: 1px solid var(--gold);
@@ -1361,6 +1420,7 @@ let scores = {};
 let uploads = {};
 let released = {};
 let scorePublished = {};
+let scoreComments = {};
 let goldOverrideUsed = false;
 let patrickLogins = [];
 let db = null;
@@ -1403,10 +1463,11 @@ try {
       uploads = d.uploads || {};
       released = d.released || {};
       scorePublished = d.scorePublished || {};
+      scoreComments = d.scoreComments || {};
       goldOverrideUsed = d.goldOverrideUsed === true;
       patrickLogins = d.patrickLogins || [];
     } else {
-      scores = {}; uploads = {}; released = {}; scorePublished = {}; goldOverrideUsed = false; patrickLogins = [];
+      scores = {}; uploads = {}; released = {}; scorePublished = {}; scoreComments = {}; goldOverrideUsed = false; patrickLogins = [];
     }
     render();
   }, (err) => {
@@ -1423,7 +1484,7 @@ function showWarn(msg) {
   w.textContent = '⚠️ ' + msg;
 }
 
-async function saveData(newScores, newUploads, newReleased, newOverride, newPublished) {
+async function saveData(newScores, newUploads, newReleased, newOverride, newPublished, newComments) {
   if (!db) return;
   try {
     // Read current to preserve fields we don't manage here (patrickLogins, snoopAttempts)
@@ -1435,6 +1496,7 @@ async function saveData(newScores, newUploads, newReleased, newOverride, newPubl
       released: newReleased ?? released,
       goldOverrideUsed: newOverride ?? goldOverrideUsed,
       scorePublished: newPublished ?? scorePublished,
+      scoreComments: newComments ?? scoreComments,
       patrickLogins: existing.patrickLogins || patrickLogins || [],
       snoopAttempts: existing.snoopAttempts || []
     });
@@ -1495,6 +1557,30 @@ async function saveMyScore(key, value) {
   }
   scores = newScores;
   await saveData(newScores, uploads, released);
+}
+
+async function saveMyComment(key, text) {
+  if (!currentCrewId) return;
+  const newComments = { ...scoreComments };
+  if (!newComments[key]) newComments[key] = {};
+  else newComments[key] = { ...newComments[key] };
+  if (text && text.trim()) {
+    newComments[key][currentCrewId] = text.trim();
+  } else {
+    delete newComments[key][currentCrewId];
+    if (Object.keys(newComments[key]).length === 0) delete newComments[key];
+  }
+  scoreComments = newComments;
+  await saveData(scores, uploads, released, goldOverrideUsed, scorePublished, newComments);
+}
+
+function getMyComment(key) {
+  return (scoreComments[key] && scoreComments[key][currentCrewId]) || '';
+}
+
+function getAllComments(key) {
+  if (!scoreComments[key]) return [];
+  return Object.values(scoreComments[key]).filter(c => c && c.trim());
 }
 
 async function toggleRelease(key) {
@@ -1815,6 +1901,9 @@ function renderCrewPanel() {
       </div>
       <input type="number" min="0" max="100" class="score" value="${myScore != null ? myScore : ''}" placeholder="—" data-key="${o.key}" title="Jouw score (0-100)"/>
       <button class="btn-small" data-clear="${o.key}">Wis mijn</button>
+      <div class="crew-comment-row">
+        <input type="text" class="crew-comment-input" data-comment-key="${o.key}" maxlength="200" placeholder="💬 Commentaar voor Patje (anoniem, optioneel)" value="${getMyComment(o.key).replace(/"/g, '&quot;')}"/>
+      </div>
       ${opUploads.length ? `<div class="uploads-preview">${opUploads.map((u, i) => renderUploadPreview(u, o.key, i, true)).join('')}</div>` : ''}
     `;
     list.appendChild(row);
@@ -1826,6 +1915,17 @@ function renderCrewPanel() {
       const v = e.target.value;
       if (v === '') saveMyScore(k, null);
       else saveMyScore(k, Math.max(0, Math.min(100, parseInt(v) || 0)));
+    });
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.target.blur(); });
+  });
+  list.querySelectorAll('input.crew-comment-input').forEach(input => {
+    input.addEventListener('blur', (e) => {
+      const k = e.target.dataset.commentKey;
+      const v = e.target.value;
+      // Only save if changed from current
+      if (v.trim() !== getMyComment(k)) {
+        saveMyComment(k, v);
+      }
     });
     input.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.target.blur(); });
   });
@@ -1857,8 +1957,9 @@ function buildVoteBreakdown(key) {
     if (opScores && typeof opScores === 'object' && opScores[m.id] != null) {
       s = opScores[m.id];
     }
+    const comment = (scoreComments[key] && scoreComments[key][m.id]) || '';
     if (s != null) {
-      voted.push({ name: m.name, score: s });
+      voted.push({ name: m.name, score: s, comment });
     } else {
       notVoted.push(m.name);
     }
@@ -1870,7 +1971,13 @@ function buildVoteBreakdown(key) {
         ${voted.length ? `
           <div class="vote-section">
             <div class="vote-section-title voted">✓ Gestemd:</div>
-            ${voted.map(v => `<div class="vote-row"><span class="vote-name">${v.name}</span><span class="vote-score">${v.score}</span></div>`).join('')}
+            ${voted.map(v => `
+              <div class="vote-row">
+                <span class="vote-name">${v.name}</span>
+                <span class="vote-score">${v.score}</span>
+              </div>
+              ${v.comment ? `<div class="vote-comment">💬 "${v.comment.replace(/</g, '&lt;')}"</div>` : ''}
+            `).join('')}
           </div>
         ` : ''}
         ${notVoted.length ? `
@@ -2005,6 +2112,7 @@ function buildQuestCard(o, state) {
   } else if (state === 'completed') {
     const score = getPublishedAverage(o.key);
     const voteCount = getVoteCount(o.key);
+    const crewComments = getAllComments(o.key);
     statusHtml = `
       <div class="quest-status scored">
         <span class="lbl">✓ AFGEROND</span>
@@ -2012,6 +2120,12 @@ function buildQuestCard(o, state) {
         <div style="margin-top:6px; font-size:12px; opacity:0.85; font-style:italic;">
           Gebaseerd op <b style="color:white;">${voteCount}</b> ${voteCount === 1 ? 'stem' : 'stemmen'} van de crew. Score kan nog wijzigen als er meer stemmen binnenkomen.
         </div>
+        ${crewComments.length ? `
+          <div class="crew-feedback">
+            <div class="crew-feedback-title">💬 De crew zegt:</div>
+            ${crewComments.map(c => `<div class="crew-feedback-item">"${c.replace(/</g, '&lt;')}"</div>`).join('')}
+          </div>
+        ` : ''}
       </div>`;
   }
 
