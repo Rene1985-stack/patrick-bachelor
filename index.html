@@ -2004,10 +2004,14 @@ function buildQuestCard(o, state) {
       </div>`;
   } else if (state === 'completed') {
     const score = getPublishedAverage(o.key);
+    const voteCount = getVoteCount(o.key);
     statusHtml = `
       <div class="quest-status scored">
         <span class="lbl">✓ AFGEROND</span>
         Score: <b style="color:white; font-size:16px;">${score}</b> / 100${o.section === 'weekend' ? ` <span style="opacity:0.7;">(×3 = ${score*3} punten)</span>` : ''}
+        <div style="margin-top:6px; font-size:12px; opacity:0.85; font-style:italic;">
+          Gebaseerd op <b style="color:white;">${voteCount}</b> ${voteCount === 1 ? 'stem' : 'stemmen'} van de crew. Score kan nog wijzigen als er meer stemmen binnenkomen.
+        </div>
       </div>`;
   }
 
