@@ -1919,15 +1919,28 @@ function renderCrewPanel() {
     input.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.target.blur(); });
   });
   list.querySelectorAll('input.crew-comment-input').forEach(input => {
+    let saveTimer = null;
+    const doSave = (val) => {
+      const k = input.dataset.commentKey;
+      if (val.trim() !== getMyComment(k)) {
+        saveMyComment(k, val);
+      }
+    };
+    input.addEventListener('input', (e) => {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => doSave(e.target.value), 800);
+    });
     input.addEventListener('blur', (e) => {
-      const k = e.target.dataset.commentKey;
-      const v = e.target.value;
-      // Only save if changed from current
-      if (v.trim() !== getMyComment(k)) {
-        saveMyComment(k, v);
+      clearTimeout(saveTimer);
+      doSave(e.target.value);
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        clearTimeout(saveTimer);
+        doSave(e.target.value);
+        e.target.blur();
       }
     });
-    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.target.blur(); });
   });
   list.querySelectorAll('[data-clear]').forEach(btn => {
     btn.addEventListener('click', () => saveMyScore(btn.dataset.clear, null));
@@ -2320,6 +2333,18 @@ function render() {
 function actualRender() {
   renderCount++;
   if (renderCount % 10 === 0) console.log('[render]', renderCount, 'renders so far');
+  // Preserve focus state across re-render
+  const focused = document.activeElement;
+  let restoreFocus = null;
+  if (focused && focused.tagName === 'INPUT' && focused.dataset) {
+    restoreFocus = {
+      key: focused.dataset.key || focused.dataset.commentKey,
+      type: focused.classList.contains('crew-comment-input') ? 'comment' : (focused.classList.contains('score') ? 'score' : null),
+      value: focused.value,
+      selStart: focused.selectionStart,
+      selEnd: focused.selectionEnd
+    };
+  }
   try {
     const panel = document.querySelector('.stats-panel');
     if (currentRole) {
@@ -2335,6 +2360,18 @@ function actualRender() {
     }
   } catch (e) {
     console.error('[render error]', e);
+  }
+  // Restore focus
+  if (restoreFocus && restoreFocus.type && restoreFocus.key) {
+    const selector = restoreFocus.type === 'comment'
+      ? `input.crew-comment-input[data-comment-key="${restoreFocus.key}"]`
+      : `input.score[data-key="${restoreFocus.key}"]`;
+    const el = document.querySelector(selector);
+    if (el) {
+      el.value = restoreFocus.value;
+      el.focus();
+      try { el.setSelectionRange(restoreFocus.selStart, restoreFocus.selEnd); } catch (e) {}
+    }
   }
 }
 
