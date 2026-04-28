@@ -1859,22 +1859,23 @@ function showWarn(msg) {
 async function saveData(newScores, newUploads, newReleased, newOverride, newPublished, newComments) {
   if (!db) return;
   try {
-    // Read current to preserve fields not being explicitly set
+    // Read current Firestore state to preserve fields we're not changing
+    // (Critical: scoreComments must come from server unless we're explicitly updating it,
+    // because comments are saved by other users and we don't want to overwrite them.)
     const snap = await getDoc(doc(db, "bachelor", "patrick"));
     const existing = snap.exists() ? snap.data() : {};
     const payload = {
-      scores: newScores ?? existing.scores ?? scores,
-      uploads: newUploads ?? existing.uploads ?? uploads,
-      released: newReleased ?? existing.released ?? released,
-      goldOverrideUsed: newOverride ?? existing.goldOverrideUsed ?? goldOverrideUsed,
-      scorePublished: newPublished ?? existing.scorePublished ?? scorePublished,
-      scoreComments: newComments ?? existing.scoreComments ?? scoreComments,
+      scores: newScores ?? scores,
+      uploads: newUploads ?? uploads,
+      released: newReleased ?? released,
+      goldOverrideUsed: newOverride ?? goldOverrideUsed,
+      scorePublished: newPublished ?? scorePublished,
+      // Always trust server for scoreComments unless explicitly updating
+      scoreComments: newComments !== undefined ? newComments : (existing.scoreComments || {}),
       patrickLogins: existing.patrickLogins || patrickLogins || [],
       snoopAttempts: existing.snoopAttempts || []
     };
-    console.log('[saveData] Writing to Firestore:', { scoreCommentsKeys: Object.keys(payload.scoreComments || {}), payload });
     await setDoc(doc(db, "bachelor", "patrick"), payload);
-    console.log('[saveData] Firestore write successful');
     setStatus('✓ Opgeslagen', 'ok');
     setTimeout(() => setStatus(''), 2000);
   } catch (e) {
@@ -1932,6 +1933,7 @@ async function saveMyScore(key, value) {
     newScores[key][currentCrewId] = value;
   }
   scores = newScores;
+  // Only pass scores - other fields will be preserved from Firestore
   await saveData(newScores, uploads, released);
 }
 
@@ -1952,7 +1954,7 @@ async function saveMyComment(key, text) {
   }
   console.log('[saveMyComment] New scoreComments object:', newComments);
   scoreComments = newComments;
-  await saveData(scores, uploads, released, goldOverrideUsed, scorePublished, newComments);
+  await saveData(undefined, undefined, undefined, undefined, undefined, newComments);
   console.log('[saveMyComment] Save call returned');
 }
 
@@ -2900,7 +2902,11 @@ function actualRender() {
       : `input.score[data-key="${restoreFocus.key}"]`;
     const el = document.querySelector(selector);
     if (el) {
-      el.value = restoreFocus.value;
+      // Only restore value if user is mid-typing (focus stayed)
+      // Don't overwrite freshly rendered values from Firestore
+      if (restoreFocus.type === 'score') {
+        el.value = restoreFocus.value;
+      }
       el.focus();
       try { el.setSelectionRange(restoreFocus.selStart, restoreFocus.selEnd); } catch (e) {}
     }
