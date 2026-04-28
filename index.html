@@ -612,6 +612,83 @@
   }
   .upload-zone input[type="file"] { display: none; }
 
+  .comment-zone {
+    margin-top: 12px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255, 216, 74, 0.3);
+    border-radius: 6px;
+    padding: 10px 12px;
+  }
+  .comment-label {
+    display: block;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .comment-input {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    color: var(--parchment);
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    line-height: 1.4;
+    resize: vertical;
+    min-height: 60px;
+    box-sizing: border-box;
+  }
+  .comment-input:focus {
+    outline: none;
+    border-color: #ffe870;
+    box-shadow: 0 0 8px rgba(255, 216, 74, 0.3);
+  }
+  .comment-save-btn {
+    margin-top: 8px;
+    background: var(--gold);
+    color: var(--night);
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    cursor: pointer;
+    box-shadow: 0 2px 0 var(--gold-deep);
+  }
+  .comment-save-btn:hover { background: #ffe870; }
+  .comment-save-btn:disabled { opacity: 0.5; cursor: wait; }
+  .comment-status {
+    margin-left: 10px;
+    font-size: 12px;
+    font-style: italic;
+  }
+  .comment-status.ok { color: var(--green); }
+  .comment-status.err { color: #e84838; }
+  .comment-display {
+    background: rgba(0,0,0,0.3);
+    border-left: 3px solid var(--green);
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    color: var(--parchment);
+    line-height: 1.5;
+  }
+  .comment-preview {
+    flex-basis: 100%;
+    background: rgba(0,0,0,0.3);
+    border-left: 3px solid var(--gold);
+    padding: 8px 12px;
+    border-radius: 0 4px 4px 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    color: var(--parchment);
+    line-height: 1.4;
+  }
+
   .upload-progress {
     margin-top: 10px; height: 6px; background: rgba(0,0,0,0.3); border-radius: 3px; overflow: hidden;
   }
@@ -1385,6 +1462,24 @@ async function removeUpload(opdrachtKey, uploadIndex) {
   await saveData(scores, newUploads, released, goldOverrideUsed);
 }
 
+async function saveComment(opdrachtKey, text) {
+  const newUploads = { ...uploads };
+  if (!newUploads[opdrachtKey]) newUploads[opdrachtKey] = [];
+  else newUploads[opdrachtKey] = [...newUploads[opdrachtKey]];
+  // Remove existing comment-only entry for this key (we keep one comment per quest)
+  newUploads[opdrachtKey] = newUploads[opdrachtKey].filter(u => u.type !== 'text/comment');
+  if (text && text.trim()) {
+    newUploads[opdrachtKey].push({
+      type: 'text/comment',
+      text: text.trim(),
+      time: Date.now()
+    });
+  }
+  if (newUploads[opdrachtKey].length === 0) delete newUploads[opdrachtKey];
+  uploads = newUploads;
+  await saveData(scores, newUploads, released, goldOverrideUsed);
+}
+
 async function uploadFile(file, opdrachtKey, progressEl) {
   if (CLOUDINARY_CLOUD_NAME === "PASTE_HIER_CLOUD_NAME") {
     throw new Error('Cloudinary niet geconfigureerd');
@@ -1695,6 +1790,10 @@ function renderCrewPanel() {
 }
 
 function renderUploadPreview(u, key, idx, clickable) {
+  if (u.type === 'text/comment') {
+    const safe = (u.text || '').replace(/</g, '&lt;').replace(/\n/g, '<br>');
+    return `<div class="comment-preview">💬 ${safe}</div>`;
+  }
   const isImg = u.type && u.type.startsWith('image/');
   const isVid = u.type && u.type.startsWith('video/');
   if (isImg) {
@@ -1830,29 +1929,50 @@ function buildQuestCard(o, state) {
       <div class="quest-message">${o.message}</div>
     </details>
     ${statusHtml}
-    ${opUploads.length ? `
-      <div style="margin-top: 12px;">
-        <div style="font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--gold); margin-bottom: 6px;">JOUW UPLOADS</div>
-        <div class="uploaded-files">
-          ${opUploads.map((u, idx) => {
-            const isImg = u.type && u.type.startsWith('image/');
-            const isVid = u.type && u.type.startsWith('video/');
-            let inner = '';
-            if (isImg) inner = `<img src="${u.url}"/>`;
-            else if (isVid) inner = `<video src="${u.url}" muted></video>`;
-            else inner = `<div class="file-icon">📄</div>`;
-            const delBtn = state === 'completed' ? '' : `<button class="del-upload" data-del-key="${o.key}" data-del-idx="${idx}" title="Verwijder">✕</button>`;
-            return `<div class="preview">${inner}${delBtn}</div>`;
-          }).join('')}
-        </div>
-      </div>
-    ` : ''}
+    ${(() => {
+      const mediaUploads = opUploads.filter(u => u.type !== 'text/comment');
+      const comment = opUploads.find(u => u.type === 'text/comment');
+      let html = '';
+      if (mediaUploads.length) {
+        html += `
+          <div style="margin-top: 12px;">
+            <div style="font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--gold); margin-bottom: 6px;">JOUW UPLOADS</div>
+            <div class="uploaded-files">
+              ${mediaUploads.map((u) => {
+                const realIdx = opUploads.indexOf(u);
+                const isImg = u.type && u.type.startsWith('image/');
+                const isVid = u.type && u.type.startsWith('video/');
+                let inner = '';
+                if (isImg) inner = `<img src="${u.url}"/>`;
+                else if (isVid) inner = `<video src="${u.url}" muted></video>`;
+                else inner = `<div class="file-icon">📄</div>`;
+                const delBtn = state === 'completed' ? '' : `<button class="del-upload" data-del-key="${o.key}" data-del-idx="${realIdx}" title="Verwijder">✕</button>`;
+                return `<div class="preview">${inner}${delBtn}</div>`;
+              }).join('')}
+            </div>
+          </div>`;
+      }
+      if (comment && state === 'completed') {
+        html += `
+          <div style="margin-top: 12px;">
+            <div style="font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--green); margin-bottom: 6px;">💬 JOUW TOELICHTING</div>
+            <div class="comment-display">${comment.text.replace(/</g, '&lt;').replace(/\n/g, '<br>')}</div>
+          </div>`;
+      }
+      return html;
+    })()}
     ${state !== 'completed' ? `
     <div class="upload-zone" data-key="${o.key}">
       <input type="file" accept="image/*,video/*" multiple/>
       <p>📤 UPLOAD BEWIJS</p>
       <span>Klik of sleep foto/video hierheen</span>
       <div class="upload-progress" style="display:none;"><div class="bar"></div></div>
+    </div>
+    <div class="comment-zone">
+      <label class="comment-label">💬 Toelichting / antwoord (optioneel)</label>
+      <textarea class="comment-input" data-comment-key="${o.key}" rows="3" placeholder="Vul hier je antwoord, gemiddelde schoenmaat, hoogte, of andere uitleg in...">${(opUploads.find(u => u.type === 'text/comment') || {}).text || ''}</textarea>
+      <button class="comment-save-btn" data-comment-save="${o.key}">💾 Opslaan</button>
+      <span class="comment-status" data-comment-status="${o.key}"></span>
     </div>
     <details class="upload-tips">
       <summary>📱 Tips voor iPhone (max 100 MB per bestand)</summary>
@@ -1905,6 +2025,29 @@ function buildQuestCard(o, state) {
       const k = btn.dataset.delKey;
       const idx = parseInt(btn.dataset.delIdx);
       removeUpload(k, idx);
+    });
+  });
+
+  // Hook up comment save
+  div.querySelectorAll('[data-comment-save]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const k = btn.dataset.commentSave;
+      const ta = div.querySelector(`[data-comment-key="${k}"]`);
+      const status = div.querySelector(`[data-comment-status="${k}"]`);
+      if (!ta) return;
+      btn.disabled = true;
+      status.textContent = 'Opslaan...';
+      status.className = 'comment-status';
+      try {
+        await saveComment(k, ta.value);
+        status.textContent = '✓ Opgeslagen';
+        status.className = 'comment-status ok';
+        setTimeout(() => { status.textContent = ''; }, 2500);
+      } catch (e) {
+        status.textContent = '✗ Mislukt: ' + e.message;
+        status.className = 'comment-status err';
+      }
+      btn.disabled = false;
     });
   });
 
