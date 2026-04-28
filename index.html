@@ -593,6 +593,27 @@
     font-family: 'MedievalSharp', cursive;
     font-size: 14px;
   }
+  .recap-tfoot-row {
+    background: rgba(255, 216, 74, 0.18);
+    border-top: 2px solid var(--gold);
+  }
+  .recap-tfoot-row .recap-td-key {
+    background: rgba(255, 216, 74, 0.25);
+    color: var(--gold) !important;
+    font-size: 9px !important;
+  }
+  .recap-tfoot-row .recap-td-colavg {
+    color: white !important;
+    font-weight: bold;
+    font-family: 'MedievalSharp', cursive;
+    font-size: 14px;
+    background: rgba(255, 216, 74, 0.15);
+  }
+  .recap-tfoot-row .recap-td-overall {
+    background: var(--gold) !important;
+    color: var(--night) !important;
+    font-size: 16px !important;
+  }
   .recap-comment-marker {
     font-size: 9px;
     margin-left: 2px;
@@ -755,6 +776,18 @@
     body.printing-recap .recap-table td.recap-td-avg {
       background: #f4e4bc !important;
       color: black !important;
+    }
+    body.printing-recap .recap-tfoot-row {
+      background: #ffe870 !important;
+      border-top: 2px solid #c89020 !important;
+    }
+    body.printing-recap .recap-tfoot-row .recap-td-colavg {
+      color: black !important;
+      background: #fff8c8 !important;
+    }
+    body.printing-recap .recap-tfoot-row .recap-td-overall {
+      background: #c89020 !important;
+      color: white !important;
     }
     body.printing-recap .recap-comments details { page-break-inside: avoid; }
     body.printing-recap .recap-person {
@@ -2322,6 +2355,16 @@ function renderCrewRecap() {
     return { o, cells, avg };
   });
 
+  // Column averages (per crew member, across all opdrachten)
+  const colAvgs = CREW_MEMBERS.map(m => {
+    const idx = CREW_MEMBERS.indexOf(m);
+    const vals = matrixRows.map(r => r.cells[idx].score).filter(v => v != null);
+    return vals.length ? Math.round(vals.reduce((a,b) => a+b, 0) / vals.length) : null;
+  });
+  // Overall average across all scores
+  const allScores = matrixRows.flatMap(r => r.cells.map(c => c.score)).filter(v => v != null);
+  const overallAvg = allScores.length ? Math.round(allScores.reduce((a,b) => a+b, 0) / allScores.length) : null;
+
   el.innerHTML = `
     <details class="recap-section">
       <summary>📊 Eindoverzicht — wie was streng, wie mild?</summary>
@@ -2362,6 +2405,13 @@ function renderCrewRecap() {
                 </tr>
               `).join('')}
             </tbody>
+            <tfoot>
+              <tr class="recap-tfoot-row">
+                <td class="recap-td-key">Gem</td>
+                ${colAvgs.map(a => `<td class="recap-td-colavg">${a != null ? a : '—'}</td>`).join('')}
+                <td class="recap-td-avg recap-td-overall">${overallAvg != null ? overallAvg : '—'}</td>
+              </tr>
+            </tfoot>
           </table>
         </div>
 
@@ -2376,12 +2426,12 @@ function renderCrewRecap() {
             if (myComments.length === 0) return '';
             return `
               <details class="recap-person">
-                <summary>${m.name} <span class="recap-person-count">(${myComments.length} comment${myComments.length > 1 ? 's' : ''})</span></summary>
+                <summary><b>${m.name}</b> <span class="recap-person-count">(${myComments.length} comment${myComments.length > 1 ? 's' : ''})</span></summary>
                 <div class="recap-person-comments">
                   ${myComments.map(c => `
                     <div class="recap-comment-entry">
                       <span class="recap-comment-key">${c.key}</span>
-                      <span class="recap-comment-text">"${c.text.replace(/</g, '&lt;')}"</span>
+                      <span class="recap-comment-text"><b style="color:var(--gold); font-style:normal;">${m.name}:</b> "${c.text.replace(/</g, '&lt;')}"</span>
                     </div>
                   `).join('')}
                 </div>
