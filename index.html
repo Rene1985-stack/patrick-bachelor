@@ -467,6 +467,196 @@
     color: var(--parchment);
     line-height: 1.4;
   }
+
+  .recap-section {
+    margin-top: 18px;
+    background: linear-gradient(180deg, rgba(255, 122, 26, 0.12) 0%, rgba(0,0,0,0.3) 100%);
+    border: 2px solid var(--sheikah-orange);
+    border-radius: 8px;
+    padding: 0 14px;
+  }
+  .recap-section summary {
+    cursor: pointer;
+    color: var(--sheikah-orange);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    list-style: none;
+    padding: 14px 0;
+  }
+  .recap-section summary::-webkit-details-marker { display: none; }
+  .recap-section summary::before {
+    content: '▶ ';
+    display: inline-block;
+    transition: transform 0.2s;
+  }
+  .recap-section[open] summary::before { transform: rotate(90deg); }
+  .recap-content {
+    padding: 4px 0 16px;
+    border-top: 1px solid rgba(255, 122, 26, 0.3);
+  }
+  .recap-subtitle {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin: 14px 0 8px;
+  }
+  .recap-rankings {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .recap-rank-row {
+    display: grid;
+    grid-template-columns: 36px 1fr auto auto;
+    gap: 10px;
+    align-items: center;
+    background: rgba(0,0,0,0.25);
+    padding: 6px 10px;
+    border-radius: 4px;
+  }
+  .recap-rank-row.empty { opacity: 0.5; }
+  .recap-rank {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: var(--gold);
+  }
+  .recap-rank-name {
+    font-family: 'MedievalSharp', cursive;
+    font-size: 16px;
+    color: white;
+  }
+  .recap-rank-count {
+    font-size: 11px;
+    color: var(--parchment-2);
+    font-style: italic;
+  }
+  .recap-rank-avg {
+    font-family: 'MedievalSharp', cursive;
+    font-size: 22px;
+    color: var(--gold);
+    font-weight: bold;
+    min-width: 36px;
+    text-align: right;
+  }
+  .recap-table-wrap {
+    overflow-x: auto;
+    background: rgba(0,0,0,0.3);
+    border-radius: 4px;
+    padding: 4px;
+  }
+  .recap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+  }
+  .recap-table th {
+    background: rgba(255, 216, 74, 0.15);
+    color: var(--gold);
+    padding: 6px 4px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid rgba(255, 216, 74, 0.3);
+    text-align: center;
+  }
+  .recap-table th.recap-th-name { text-align: center; }
+  .recap-table th.recap-th-avg {
+    background: rgba(255, 216, 74, 0.25);
+    color: white;
+  }
+  .recap-table td {
+    padding: 6px 4px;
+    text-align: center;
+    color: var(--parchment);
+    border-bottom: 1px solid rgba(255, 216, 74, 0.08);
+    position: relative;
+    cursor: help;
+  }
+  .recap-table td.recap-td-key {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: var(--gold);
+    text-align: left;
+    padding-left: 8px;
+    cursor: help;
+  }
+  .recap-table td.recap-td-empty {
+    color: rgba(255,255,255,0.2);
+  }
+  .recap-table td.recap-td-avg {
+    background: rgba(255, 216, 74, 0.1);
+    color: white;
+    font-weight: bold;
+    font-family: 'MedievalSharp', cursive;
+    font-size: 14px;
+  }
+  .recap-comment-marker {
+    font-size: 9px;
+    margin-left: 2px;
+    opacity: 0.7;
+  }
+  .recap-comments {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .recap-person {
+    background: rgba(0,0,0,0.25);
+    border-radius: 4px;
+    padding: 0 10px;
+  }
+  .recap-person summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 8px 0;
+    color: var(--parchment);
+    font-family: 'MedievalSharp', cursive;
+    font-size: 14px;
+  }
+  .recap-person summary::-webkit-details-marker { display: none; }
+  .recap-person summary::before {
+    content: '▶ ';
+    color: var(--gold);
+    font-size: 9px;
+    transition: transform 0.2s;
+  }
+  .recap-person[open] summary::before { transform: rotate(90deg); }
+  .recap-person-count {
+    font-size: 11px;
+    color: var(--parchment-2);
+    font-style: italic;
+    margin-left: 4px;
+  }
+  .recap-person-comments {
+    padding: 4px 0 10px;
+    border-top: 1px solid rgba(255, 216, 74, 0.15);
+  }
+  .recap-comment-entry {
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    gap: 8px;
+    padding: 4px 0;
+    align-items: start;
+  }
+  .recap-comment-key {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: var(--gold);
+    background: rgba(0,0,0,0.3);
+    padding: 3px 6px;
+    border-radius: 3px;
+    text-align: center;
+  }
+  .recap-comment-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--parchment);
+    line-height: 1.4;
+  }
   .score-row input.score {
     padding: 6px 8px; background: rgba(0,0,0,0.4);
     color: white; border: 1px solid var(--gold);
@@ -1267,6 +1457,9 @@
   <div class="info">René en Niels geven opdrachten vrij. Iedereen scoort 0–100. Klik op uploads om bewijs te bekijken.</div>
   <div id="score-list"></div>
   <div class="status" id="crew-status"></div>
+
+  <div id="crew-recap-section"></div>
+
   <div class="footnote">
     <b>Workflow:</b> 1) <b>René of Niels</b> klikt <b>👁 Zichtbaar voor Patrick</b> → opdracht verschijnt in zijn quest log. 2) Patrick uploadt bewijs. 3) <b>Iedere crew member</b> geeft een score (0–100). Het gemiddelde komt op de kaart. PIN crew: <b>2305</b> · PIN Patrick: <b>PATJE</b>.
   </div>
@@ -1959,6 +2152,121 @@ function renderCrewPanel() {
       openModal(url, type);
     });
   });
+
+  renderCrewRecap();
+}
+
+function renderCrewRecap() {
+  const el = document.getElementById('crew-recap-section');
+  if (!el) return;
+
+  // Alleen zichtbaar voor admins (René en Niels)
+  if (!ADMIN_IDS.includes(currentCrewId)) {
+    el.innerHTML = '';
+    return;
+  }
+
+  // Compute per-crew averages and per-quest averages
+  const crewStats = CREW_MEMBERS.map(m => {
+    const myScores = [];
+    OPDRACHTEN.forEach(o => {
+      const opScores = scores[o.key];
+      if (opScores && typeof opScores === 'object' && opScores[m.id] != null) {
+        myScores.push(opScores[m.id]);
+      }
+    });
+    const avg = myScores.length ? Math.round(myScores.reduce((a,b) => a+b, 0) / myScores.length) : null;
+    return { id: m.id, name: m.name, avg, count: myScores.length };
+  });
+
+  // Sort by avg ascending (strictest first), nulls last
+  const sorted = [...crewStats].sort((a, b) => {
+    if (a.avg == null && b.avg == null) return 0;
+    if (a.avg == null) return 1;
+    if (b.avg == null) return -1;
+    return a.avg - b.avg;
+  });
+
+  // Build full matrix
+  const matrixRows = OPDRACHTEN.map(o => {
+    const cells = CREW_MEMBERS.map(m => {
+      const opScores = scores[o.key];
+      const score = (opScores && typeof opScores === 'object') ? opScores[m.id] : null;
+      const comment = (scoreComments[o.key] && scoreComments[o.key][m.id]) || '';
+      return { score, comment };
+    });
+    const avgs = cells.filter(c => c.score != null).map(c => c.score);
+    const avg = avgs.length ? Math.round(avgs.reduce((a,b) => a+b, 0) / avgs.length) : null;
+    return { o, cells, avg };
+  });
+
+  el.innerHTML = `
+    <details class="recap-section">
+      <summary>📊 Eindoverzicht — wie was streng, wie mild?</summary>
+      <div class="recap-content">
+        <div class="recap-subtitle">⭐ Gemiddelde score per crew-lid (laagste eerst):</div>
+        <div class="recap-rankings">
+          ${sorted.map((s, i) => `
+            <div class="recap-rank-row${s.avg == null ? ' empty' : ''}">
+              <span class="recap-rank">#${i+1}</span>
+              <span class="recap-rank-name">${s.name}</span>
+              <span class="recap-rank-count">${s.count} stemmen</span>
+              <span class="recap-rank-avg">${s.avg != null ? s.avg : '—'}</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="recap-subtitle" style="margin-top:18px;">📋 Volledig overzicht (klik op een naam om details te zien):</div>
+        <div class="recap-table-wrap">
+          <table class="recap-table">
+            <thead>
+              <tr>
+                <th>Opdracht</th>
+                ${CREW_MEMBERS.map(m => `<th class="recap-th-name" title="${m.name}">${m.name.slice(0,4)}</th>`).join('')}
+                <th class="recap-th-avg">Gem</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${matrixRows.map(row => `
+                <tr>
+                  <td class="recap-td-key" title="${row.o.task}">${row.o.key}${row.o.section === 'weekend' ? ' ×3' : ''}</td>
+                  ${row.cells.map(c => `
+                    <td class="${c.score == null ? 'recap-td-empty' : ''}" ${c.comment ? `title="${c.comment.replace(/"/g, '&quot;')}"` : ''}>
+                      ${c.score != null ? c.score : '—'}${c.comment ? '<span class="recap-comment-marker">💬</span>' : ''}
+                    </td>
+                  `).join('')}
+                  <td class="recap-td-avg">${row.avg != null ? row.avg : '—'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="recap-subtitle" style="margin-top:18px;">💬 Comments per crew-lid:</div>
+        <div class="recap-comments">
+          ${CREW_MEMBERS.map(m => {
+            const myComments = [];
+            OPDRACHTEN.forEach(o => {
+              const c = (scoreComments[o.key] && scoreComments[o.key][m.id]) || '';
+              if (c) myComments.push({ key: o.key, name: o.name, text: c });
+            });
+            if (myComments.length === 0) return '';
+            return `
+              <details class="recap-person">
+                <summary>${m.name} <span class="recap-person-count">(${myComments.length} comment${myComments.length > 1 ? 's' : ''})</span></summary>
+                <div class="recap-person-comments">
+                  ${myComments.map(c => `
+                    <div class="recap-comment-entry">
+                      <span class="recap-comment-key">${c.key}</span>
+                      <span class="recap-comment-text">"${c.text.replace(/</g, '&lt;')}"</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </details>`;
+          }).join('')}
+        </div>
+      </div>
+    </details>`;
 }
 
 function buildVoteBreakdown(key) {
