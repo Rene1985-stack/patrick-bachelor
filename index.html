@@ -657,6 +657,128 @@
     color: var(--parchment);
     line-height: 1.4;
   }
+  .recap-print-btn {
+    background: var(--sheikah-orange);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 14px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    cursor: pointer;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 0 #c4501a;
+    letter-spacing: 0.05em;
+  }
+  .recap-print-btn:hover { background: #ff8a3a; }
+
+  /* === PRINT STYLES === */
+  @media print {
+    body.printing-recap {
+      background: white !important;
+      padding: 0 !important;
+      gap: 0 !important;
+      display: block !important;
+    }
+    body.printing-recap > *:not(#crew-panel) { display: none !important; }
+    body.printing-recap #crew-panel {
+      background: white !important;
+      border: none !important;
+      color: black !important;
+      max-width: none !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+      display: block !important;
+    }
+    body.printing-recap #crew-panel > *:not(#crew-recap-section) { display: none !important; }
+    body.printing-recap .recap-section {
+      background: white !important;
+      border: 2px solid #5c3a1c !important;
+      color: black !important;
+      padding: 16px !important;
+    }
+    body.printing-recap .recap-section summary { display: none !important; }
+    body.printing-recap .recap-section[open] > summary { display: none !important; }
+    body.printing-recap .recap-content {
+      border: none !important;
+      padding: 0 !important;
+    }
+    body.printing-recap .recap-print-btn { display: none !important; }
+    body.printing-recap .recap-section,
+    body.printing-recap .recap-content,
+    body.printing-recap details { display: block !important; }
+    body.printing-recap .recap-content::before {
+      content: "📊 Patrick · Champion of Hobbelrade — Eindrapport";
+      display: block;
+      font-family: 'MedievalSharp', cursive;
+      font-size: 22px;
+      color: #c89020;
+      text-align: center;
+      margin-bottom: 8px;
+      border-bottom: 2px solid #c89020;
+      padding-bottom: 8px;
+    }
+    body.printing-recap .recap-subtitle {
+      color: #8a6914 !important;
+      font-size: 10px !important;
+      page-break-after: avoid;
+    }
+    body.printing-recap .recap-rank-row {
+      background: #f4e4bc !important;
+      color: black !important;
+      page-break-inside: avoid;
+    }
+    body.printing-recap .recap-rank,
+    body.printing-recap .recap-rank-avg { color: #8a6914 !important; }
+    body.printing-recap .recap-rank-name { color: black !important; }
+    body.printing-recap .recap-rank-count { color: #5c3a1c !important; }
+    body.printing-recap .recap-table-wrap {
+      background: white !important;
+      page-break-inside: avoid;
+    }
+    body.printing-recap .recap-table {
+      font-size: 10px !important;
+    }
+    body.printing-recap .recap-table th {
+      background: #f4e4bc !important;
+      color: #5c3a1c !important;
+      font-size: 7px !important;
+      border: 1px solid #c89020 !important;
+    }
+    body.printing-recap .recap-table td {
+      color: black !important;
+      border: 1px solid #ddd !important;
+      padding: 4px !important;
+    }
+    body.printing-recap .recap-table td.recap-td-key { color: #8a6914 !important; }
+    body.printing-recap .recap-table td.recap-td-empty { color: #ccc !important; }
+    body.printing-recap .recap-table td.recap-td-avg {
+      background: #f4e4bc !important;
+      color: black !important;
+    }
+    body.printing-recap .recap-comments details { page-break-inside: avoid; }
+    body.printing-recap .recap-person {
+      background: #f9f5e8 !important;
+      border: 1px solid #c89020;
+      margin-bottom: 6px;
+    }
+    body.printing-recap .recap-person summary {
+      color: black !important;
+      pointer-events: none;
+    }
+    body.printing-recap .recap-person summary::before { content: '' !important; }
+    body.printing-recap .recap-person-count { color: #8a6914 !important; }
+    body.printing-recap .recap-comment-key {
+      background: #c89020 !important;
+      color: white !important;
+    }
+    body.printing-recap .recap-comment-text { color: black !important; }
+    body.printing-recap .recap-comment-marker { display: none; }
+    @page {
+      margin: 1cm;
+      size: A4 portrait;
+    }
+  }
   .score-row input.score {
     padding: 6px 8px; background: rgba(0,0,0,0.4);
     color: white; border: 1px solid var(--gold);
@@ -2204,6 +2326,7 @@ function renderCrewRecap() {
     <details class="recap-section">
       <summary>📊 Eindoverzicht — wie was streng, wie mild?</summary>
       <div class="recap-content">
+        <button class="recap-print-btn" id="recap-print-btn">🖨️ Exporteer naar PDF</button>
         <div class="recap-subtitle">⭐ Gemiddelde score per crew-lid (laagste eerst):</div>
         <div class="recap-rankings">
           ${sorted.map((s, i) => `
@@ -2267,6 +2390,27 @@ function renderCrewRecap() {
         </div>
       </div>
     </details>`;
+
+  const printBtn = document.getElementById('recap-print-btn');
+  if (printBtn) {
+    printBtn.addEventListener('click', () => {
+      // Force the recap details element to be open before printing
+      const recapDetails = document.querySelector('.recap-section');
+      const wasOpen = recapDetails.open;
+      recapDetails.open = true;
+      // Open all nested details inside (per-person comments)
+      const nested = recapDetails.querySelectorAll('details');
+      const wasOpenStates = Array.from(nested).map(d => d.open);
+      nested.forEach(d => d.open = true);
+      document.body.classList.add('printing-recap');
+      setTimeout(() => {
+        window.print();
+        document.body.classList.remove('printing-recap');
+        recapDetails.open = wasOpen;
+        nested.forEach((d, i) => d.open = wasOpenStates[i]);
+      }, 100);
+    });
+  }
 }
 
 function buildVoteBreakdown(key) {
