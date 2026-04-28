@@ -422,9 +422,12 @@
   .crew-comment-row {
     grid-column: 1 / -1;
     margin-top: 6px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
   }
   .crew-comment-input {
-    width: 100%;
+    flex: 1;
     background: rgba(0,0,0,0.3);
     color: var(--parchment);
     border: 1px solid rgba(255, 216, 74, 0.3);
@@ -433,6 +436,7 @@
     font-family: 'Cormorant Garamond', serif;
     font-size: 13px;
     box-sizing: border-box;
+    min-width: 0;
   }
   .crew-comment-input:focus {
     outline: none;
@@ -443,6 +447,26 @@
     color: rgba(244, 228, 188, 0.4);
     font-style: italic;
   }
+  .crew-comment-save {
+    background: var(--gold);
+    color: var(--night);
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 0 var(--gold-deep);
+    flex-shrink: 0;
+  }
+  .crew-comment-save:hover { background: #ffe870; }
+  .crew-comment-save:disabled { opacity: 0.5; cursor: wait; }
+  .crew-comment-status {
+    font-size: 14px;
+    font-weight: bold;
+    min-width: 14px;
+  }
+  .crew-comment-status.ok { color: var(--green); }
+  .crew-comment-status.err { color: #e84838; }
   .crew-feedback {
     margin-top: 10px;
     padding-top: 10px;
@@ -2251,6 +2275,8 @@ function renderCrewPanel() {
       <button class="btn-small" data-clear="${o.key}">Wis mijn</button>
       <div class="crew-comment-row">
         <input type="text" class="crew-comment-input" data-comment-key="${o.key}" maxlength="200" placeholder="💬 Commentaar voor Patje (anoniem, optioneel)" value="${getMyComment(o.key).replace(/"/g, '&quot;')}"/>
+        <button class="crew-comment-save" data-comment-save="${o.key}">💾</button>
+        <span class="crew-comment-status" data-comment-status="${o.key}"></span>
       </div>
       ${opUploads.length ? `<div class="uploads-preview">${opUploads.map((u, i) => renderUploadPreview(u, o.key, i, true)).join('')}</div>` : ''}
     `;
@@ -2266,28 +2292,22 @@ function renderCrewPanel() {
     });
     input.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.target.blur(); });
   });
-  list.querySelectorAll('input.crew-comment-input').forEach(input => {
-    let saveTimer = null;
-    const doSave = (val) => {
-      const k = input.dataset.commentKey;
-      if (val.trim() !== getMyComment(k)) {
-        saveMyComment(k, val);
+  list.querySelectorAll('button.crew-comment-save').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const k = btn.dataset.commentSave;
+      const input = list.querySelector(`input.crew-comment-input[data-comment-key="${k}"]`);
+      const status = list.querySelector(`span.crew-comment-status[data-comment-status="${k}"]`);
+      if (!input) return;
+      btn.disabled = true;
+      if (status) { status.textContent = '...'; status.className = 'crew-comment-status'; }
+      try {
+        await saveMyComment(k, input.value);
+        if (status) { status.textContent = '✓'; status.className = 'crew-comment-status ok'; }
+        setTimeout(() => { if (status) status.textContent = ''; }, 2500);
+      } catch (e) {
+        if (status) { status.textContent = '✗'; status.className = 'crew-comment-status err'; }
       }
-    };
-    input.addEventListener('input', (e) => {
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(() => doSave(e.target.value), 800);
-    });
-    input.addEventListener('blur', (e) => {
-      clearTimeout(saveTimer);
-      doSave(e.target.value);
-    });
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        clearTimeout(saveTimer);
-        doSave(e.target.value);
-        e.target.blur();
-      }
+      btn.disabled = false;
     });
   });
   list.querySelectorAll('[data-clear]').forEach(btn => {
