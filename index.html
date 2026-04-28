@@ -1802,16 +1802,16 @@ function showWarn(msg) {
 async function saveData(newScores, newUploads, newReleased, newOverride, newPublished, newComments) {
   if (!db) return;
   try {
-    // Read current to preserve fields we don't manage here (patrickLogins, snoopAttempts)
+    // Read current to preserve fields not being explicitly set
     const snap = await getDoc(doc(db, "bachelor", "patrick"));
     const existing = snap.exists() ? snap.data() : {};
     await setDoc(doc(db, "bachelor", "patrick"), {
-      scores: newScores ?? scores,
-      uploads: newUploads ?? uploads,
-      released: newReleased ?? released,
-      goldOverrideUsed: newOverride ?? goldOverrideUsed,
-      scorePublished: newPublished ?? scorePublished,
-      scoreComments: newComments ?? scoreComments,
+      scores: newScores ?? existing.scores ?? scores,
+      uploads: newUploads ?? existing.uploads ?? uploads,
+      released: newReleased ?? existing.released ?? released,
+      goldOverrideUsed: newOverride ?? existing.goldOverrideUsed ?? goldOverrideUsed,
+      scorePublished: newPublished ?? existing.scorePublished ?? scorePublished,
+      scoreComments: newComments ?? existing.scoreComments ?? scoreComments,
       patrickLogins: existing.patrickLogins || patrickLogins || [],
       snoopAttempts: existing.snoopAttempts || []
     });
