@@ -1683,7 +1683,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, onSnapshot, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCNp9TOpqSUhL0t2y5qBpw1tWoHcOrX56M",
@@ -1859,23 +1859,17 @@ function showWarn(msg) {
 async function saveData(newScores, newUploads, newReleased, newOverride, newPublished, newComments) {
   if (!db) return;
   try {
-    // Read current Firestore state to preserve fields we're not changing
-    // (Critical: scoreComments must come from server unless we're explicitly updating it,
-    // because comments are saved by other users and we don't want to overwrite them.)
-    const snap = await getDoc(doc(db, "bachelor", "patrick"));
-    const existing = snap.exists() ? snap.data() : {};
-    const payload = {
-      scores: newScores ?? scores,
-      uploads: newUploads ?? uploads,
-      released: newReleased ?? released,
-      goldOverrideUsed: newOverride ?? goldOverrideUsed,
-      scorePublished: newPublished ?? scorePublished,
-      // Always trust server for scoreComments unless explicitly updating
-      scoreComments: newComments !== undefined ? newComments : (existing.scoreComments || {}),
-      patrickLogins: existing.patrickLogins || patrickLogins || [],
-      snoopAttempts: existing.snoopAttempts || []
-    };
-    await setDoc(doc(db, "bachelor", "patrick"), payload);
+    // Build update payload with ONLY the fields actually changed.
+    // updateDoc leaves all other fields untouched in Firestore.
+    const update = {};
+    if (newScores !== undefined) update.scores = newScores;
+    if (newUploads !== undefined) update.uploads = newUploads;
+    if (newReleased !== undefined) update.released = newReleased;
+    if (newOverride !== undefined) update.goldOverrideUsed = newOverride;
+    if (newPublished !== undefined) update.scorePublished = newPublished;
+    if (newComments !== undefined) update.scoreComments = newComments;
+    if (Object.keys(update).length === 0) return; // nothing to save
+    await updateDoc(doc(db, "bachelor", "patrick"), update);
     setStatus('✓ Opgeslagen', 'ok');
     setTimeout(() => setStatus(''), 2000);
   } catch (e) {
@@ -1893,7 +1887,7 @@ async function togglePublished(key) {
   const newPublished = { ...scorePublished };
   newPublished[key] = !newPublished[key];
   scorePublished = newPublished;
-  await saveData(scores, uploads, released, goldOverrideUsed, newPublished);
+  await saveData(undefined, undefined, undefined, undefined, newPublished, undefined);
 }
 
 async function useGoldOverride() {
@@ -1903,7 +1897,7 @@ async function useGoldOverride() {
     return;
   }
   goldOverrideUsed = !goldOverrideUsed;
-  await saveData(scores, uploads, released, goldOverrideUsed);
+  await saveData(undefined, undefined, undefined, goldOverrideUsed, undefined, undefined);
 }
 
 // Calculate earned and max with multipliers + override
@@ -1933,8 +1927,8 @@ async function saveMyScore(key, value) {
     newScores[key][currentCrewId] = value;
   }
   scores = newScores;
-  // Only pass scores - other fields will be preserved from Firestore
-  await saveData(newScores, uploads, released);
+  // Only pass scores - other fields stay untouched in Firestore via updateDoc
+  await saveData(newScores, undefined, undefined, undefined, undefined, undefined);
 }
 
 async function saveMyComment(key, text) {
@@ -1942,20 +1936,37 @@ async function saveMyComment(key, text) {
     console.error('[saveMyComment] No crewId set!');
     return;
   }
-  console.log('[saveMyComment] Saving:', { key, text, crewId: currentCrewId });
-  const newComments = { ...scoreComments };
-  if (!newComments[key]) newComments[key] = {};
-  else newComments[key] = { ...newComments[key] };
-  if (text && text.trim()) {
-    newComments[key][currentCrewId] = text.trim();
-  } else {
-    delete newComments[key][currentCrewId];
-    if (Object.keys(newComments[key]).length === 0) delete newComments[key];
+  if (!db) {
+    console.error('[saveMyComment] No db!');
+    return;
   }
-  console.log('[saveMyComment] New scoreComments object:', newComments);
-  scoreComments = newComments;
-  await saveData(undefined, undefined, undefined, undefined, undefined, newComments);
-  console.log('[saveMyComment] Save call returned');
+  try {
+    // Read latest scoreComments from server (don't trust local state)
+    const snap = await getDoc(doc(db, "bachelor", "patrick"));
+    const existing = snap.exists() ? snap.data() : {};
+    const currentComments = existing.scoreComments || {};
+    const newComments = { ...currentComments };
+    if (!newComments[key]) newComments[key] = {};
+    else newComments[key] = { ...newComments[key] };
+    if (text && text.trim()) {
+      newComments[key][currentCrewId] = text.trim();
+    } else {
+      delete newComments[key][currentCrewId];
+      if (Object.keys(newComments[key]).length === 0) delete newComments[key];
+    }
+    console.log('[saveMyComment] Saving:', { key, text, crewId: currentCrewId });
+    console.log('[saveMyComment] Existing from server:', currentComments);
+    console.log('[saveMyComment] New to write:', newComments);
+    // updateDoc only touches the scoreComments field
+    await updateDoc(doc(db, "bachelor", "patrick"), {
+      scoreComments: newComments
+    });
+    scoreComments = newComments;
+    console.log('[saveMyComment] ✓ Successfully written to Firestore');
+  } catch (e) {
+    console.error('[saveMyComment] FAILED:', e);
+    throw e;
+  }
 }
 
 function getMyComment(key) {
@@ -1976,7 +1987,7 @@ async function toggleRelease(key) {
   const newReleased = { ...released };
   newReleased[key] = !newReleased[key];
   released = newReleased;
-  await saveData(scores, uploads, newReleased);
+  await saveData(undefined, undefined, newReleased, undefined, undefined, undefined);
 }
 
 async function removeUpload(opdrachtKey, uploadIndex) {
@@ -1987,7 +1998,7 @@ async function removeUpload(opdrachtKey, uploadIndex) {
   newUploads[opdrachtKey].splice(uploadIndex, 1);
   if (newUploads[opdrachtKey].length === 0) delete newUploads[opdrachtKey];
   uploads = newUploads;
-  await saveData(scores, newUploads, released, goldOverrideUsed);
+  await saveData(undefined, newUploads, undefined, undefined, undefined, undefined);
 }
 
 async function saveComment(opdrachtKey, text) {
@@ -2005,7 +2016,7 @@ async function saveComment(opdrachtKey, text) {
   }
   if (newUploads[opdrachtKey].length === 0) delete newUploads[opdrachtKey];
   uploads = newUploads;
-  await saveData(scores, newUploads, released, goldOverrideUsed);
+  await saveData(undefined, newUploads, undefined, undefined, undefined, undefined);
 }
 
 async function uploadFile(file, opdrachtKey, progressEl) {
@@ -2038,7 +2049,7 @@ async function uploadFile(file, opdrachtKey, progressEl) {
           url: fileUrl, name: file.name, type: file.type, time: Date.now()
         });
         uploads = newUploads;
-        await saveData(scores, newUploads, released);
+        await saveData(undefined, newUploads, undefined, undefined, undefined, undefined);
         resolve(fileUrl);
       } else {
         reject(new Error('Upload mislukt: ' + xhr.responseText));
@@ -2980,13 +2991,7 @@ async function logSnoopAttempt(attempt) {
     existing.push({ attempt: String(attempt).slice(0, 20), time: Date.now() });
     // Bewaar laatste 50
     const trimmed = existing.slice(-50);
-    await setDoc(doc(db, "bachelor", "patrick"), {
-      scores: scores,
-      uploads: uploads,
-      released: released,
-      goldOverrideUsed: goldOverrideUsed,
-      scorePublished: scorePublished,
-      patrickLogins: patrickLogins,
+    await updateDoc(doc(db, "bachelor", "patrick"), {
       snoopAttempts: trimmed
     });
   } catch (e) { /* stil falen */ }
@@ -3004,13 +3009,7 @@ async function logPatrickLogin() {
     // Bewaar laatste 100
     const trimmed = existing.slice(-100);
     patrickLogins = trimmed;
-    await setDoc(doc(db, "bachelor", "patrick"), {
-      scores: scores,
-      uploads: uploads,
-      released: released,
-      goldOverrideUsed: goldOverrideUsed,
-      scorePublished: scorePublished,
-      snoopAttempts: snap.exists() ? (snap.data().snoopAttempts || []) : [],
+    await updateDoc(doc(db, "bachelor", "patrick"), {
       patrickLogins: trimmed
     });
   } catch (e) { /* stil falen */ }
