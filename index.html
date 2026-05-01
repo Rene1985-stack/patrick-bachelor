@@ -1825,6 +1825,20 @@ function getVoteCount(key) {
 }
 
 // --- Init Firebase ---
+// scoreComments live in their OWN document (bachelor/patrick_comments) so that
+// no setDoc/updateDoc on bachelor/patrick — including any old cached browser tab —
+// can ever wipe them.
+let mainScoreComments = {};     // legacy fallback from bachelor/patrick.scoreComments
+let dedicatedScoreComments = {}; // authoritative source from bachelor/patrick_comments
+let commentsDocLoaded = false;
+
+function recomputeScoreComments() {
+  // Prefer the dedicated doc once loaded; fall back to the legacy field on the main doc.
+  scoreComments = commentsDocLoaded && Object.keys(dedicatedScoreComments).length > 0
+    ? dedicatedScoreComments
+    : mainScoreComments;
+}
+
 try {
   const app = initializeApp(firebaseConfig);
   db = getFirestore(app);
@@ -1835,16 +1849,29 @@ try {
       uploads = d.uploads || {};
       released = d.released || {};
       scorePublished = d.scorePublished || {};
-      scoreComments = d.scoreComments || {};
+      mainScoreComments = d.scoreComments || {};
       goldOverrideUsed = d.goldOverrideUsed === true;
       patrickLogins = d.patrickLogins || [];
     } else {
-      scores = {}; uploads = {}; released = {}; scorePublished = {}; scoreComments = {}; goldOverrideUsed = false; patrickLogins = [];
+      scores = {}; uploads = {}; released = {}; scorePublished = {}; mainScoreComments = {}; goldOverrideUsed = false; patrickLogins = [];
     }
+    recomputeScoreComments();
     render();
   }, (err) => {
     console.error(err);
     showWarn('Fout bij verbinden met Firebase: ' + err.message);
+  });
+
+  // Separate listener for the comments-only document.
+  onSnapshot(doc(db, "bachelor", "patrick_comments"), (snap) => {
+    dedicatedScoreComments = snap.exists() ? (snap.data().scoreComments || {}) : {};
+    commentsDocLoaded = true;
+    recomputeScoreComments();
+    render();
+  }, (err) => {
+    console.error('[comments-doc]', err);
+    commentsDocLoaded = true;
+    recomputeScoreComments();
   });
 } catch (e) {
   showWarn('Firebase fout: ' + e.message);
@@ -1856,18 +1883,18 @@ function showWarn(msg) {
   w.textContent = '⚠️ ' + msg;
 }
 
-async function saveData(newScores, newUploads, newReleased, newOverride, newPublished, newComments) {
+async function saveData(newScores, newUploads, newReleased, newOverride, newPublished) {
   if (!db) return;
   try {
     // Build update payload with ONLY the fields actually changed.
     // updateDoc leaves all other fields untouched in Firestore.
+    // NOTE: scoreComments live in bachelor/patrick_comments — never touched here.
     const update = {};
     if (newScores !== undefined) update.scores = newScores;
     if (newUploads !== undefined) update.uploads = newUploads;
     if (newReleased !== undefined) update.released = newReleased;
     if (newOverride !== undefined) update.goldOverrideUsed = newOverride;
     if (newPublished !== undefined) update.scorePublished = newPublished;
-    if (newComments !== undefined) update.scoreComments = newComments;
     if (Object.keys(update).length === 0) return; // nothing to save
     await updateDoc(doc(db, "bachelor", "patrick"), update);
     setStatus('✓ Opgeslagen', 'ok');
@@ -1887,7 +1914,7 @@ async function togglePublished(key) {
   const newPublished = { ...scorePublished };
   newPublished[key] = !newPublished[key];
   scorePublished = newPublished;
-  await saveData(undefined, undefined, undefined, undefined, newPublished, undefined);
+  await saveData(undefined, undefined, undefined, undefined, newPublished);
 }
 
 async function useGoldOverride() {
@@ -1897,7 +1924,7 @@ async function useGoldOverride() {
     return;
   }
   goldOverrideUsed = !goldOverrideUsed;
-  await saveData(undefined, undefined, undefined, goldOverrideUsed, undefined, undefined);
+  await saveData(undefined, undefined, undefined, goldOverrideUsed, undefined);
 }
 
 // Calculate earned and max with multipliers + override
@@ -1928,7 +1955,7 @@ async function saveMyScore(key, value) {
   }
   scores = newScores;
   // Only pass scores - other fields stay untouched in Firestore via updateDoc
-  await saveData(newScores, undefined, undefined, undefined, undefined, undefined);
+  await saveData(newScores);
 }
 
 async function saveMyComment(key, text) {
@@ -1941,11 +1968,15 @@ async function saveMyComment(key, text) {
     return;
   }
   try {
-    // Read latest scoreComments from server (don't trust local state)
-    const snap = await getDoc(doc(db, "bachelor", "patrick"));
-    const existing = snap.exists() ? snap.data() : {};
-    const currentComments = existing.scoreComments || {};
-    const newComments = { ...currentComments };
+    // Read latest from the DEDICATED comments doc (immune to writes on bachelor/patrick)
+    const ref = doc(db, "bachelor", "patrick_comments");
+    const snap = await getDoc(ref);
+    const serverComments = (snap.exists() ? (snap.data().scoreComments || {}) : {});
+    // Merge with any legacy comments still on the main doc, so nothing is lost on first write.
+    const baseComments = (Object.keys(serverComments).length === 0)
+      ? { ...mainScoreComments }
+      : { ...serverComments };
+    const newComments = { ...baseComments };
     if (!newComments[key]) newComments[key] = {};
     else newComments[key] = { ...newComments[key] };
     if (text && text.trim()) {
@@ -1955,14 +1986,13 @@ async function saveMyComment(key, text) {
       if (Object.keys(newComments[key]).length === 0) delete newComments[key];
     }
     console.log('[saveMyComment] Saving:', { key, text, crewId: currentCrewId });
-    console.log('[saveMyComment] Existing from server:', currentComments);
     console.log('[saveMyComment] New to write:', newComments);
-    // updateDoc only touches the scoreComments field
-    await updateDoc(doc(db, "bachelor", "patrick"), {
-      scoreComments: newComments
-    });
-    scoreComments = newComments;
-    console.log('[saveMyComment] ✓ Successfully written to Firestore');
+    // setDoc with merge:true creates the doc if missing and only touches the field given.
+    await setDoc(ref, { scoreComments: newComments }, { merge: true });
+    dedicatedScoreComments = newComments;
+    commentsDocLoaded = true;
+    recomputeScoreComments();
+    console.log('[saveMyComment] ✓ Successfully written to bachelor/patrick_comments');
   } catch (e) {
     console.error('[saveMyComment] FAILED:', e);
     throw e;
@@ -1987,7 +2017,7 @@ async function toggleRelease(key) {
   const newReleased = { ...released };
   newReleased[key] = !newReleased[key];
   released = newReleased;
-  await saveData(undefined, undefined, newReleased, undefined, undefined, undefined);
+  await saveData(undefined, undefined, newReleased);
 }
 
 async function removeUpload(opdrachtKey, uploadIndex) {
@@ -1998,7 +2028,7 @@ async function removeUpload(opdrachtKey, uploadIndex) {
   newUploads[opdrachtKey].splice(uploadIndex, 1);
   if (newUploads[opdrachtKey].length === 0) delete newUploads[opdrachtKey];
   uploads = newUploads;
-  await saveData(undefined, newUploads, undefined, undefined, undefined, undefined);
+  await saveData(undefined, newUploads);
 }
 
 async function saveComment(opdrachtKey, text) {
@@ -2016,7 +2046,7 @@ async function saveComment(opdrachtKey, text) {
   }
   if (newUploads[opdrachtKey].length === 0) delete newUploads[opdrachtKey];
   uploads = newUploads;
-  await saveData(undefined, newUploads, undefined, undefined, undefined, undefined);
+  await saveData(undefined, newUploads);
 }
 
 async function uploadFile(file, opdrachtKey, progressEl) {
@@ -2049,7 +2079,7 @@ async function uploadFile(file, opdrachtKey, progressEl) {
           url: fileUrl, name: file.name, type: file.type, time: Date.now()
         });
         uploads = newUploads;
-        await saveData(undefined, newUploads, undefined, undefined, undefined, undefined);
+        await saveData(undefined, newUploads);
         resolve(fileUrl);
       } else {
         reject(new Error('Upload mislukt: ' + xhr.responseText));
