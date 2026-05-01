@@ -492,13 +492,30 @@
     line-height: 1.4;
   }
 
-  .recap-section {
+  .recap-section, .backup-section {
     margin-top: 18px;
     background: linear-gradient(180deg, rgba(255, 122, 26, 0.12) 0%, rgba(0,0,0,0.3) 100%);
     border: 2px solid var(--sheikah-orange);
     border-radius: 8px;
     padding: 0 14px;
   }
+  .backup-section summary {
+    cursor: pointer;
+    color: var(--sheikah-orange);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    list-style: none;
+    padding: 14px 0;
+  }
+  .backup-section summary::-webkit-details-marker { display: none; }
+  .backup-section summary::before {
+    content: '▶ ';
+    display: inline-block;
+    transition: transform 0.2s;
+  }
+  .backup-section[open] summary::before { transform: rotate(90deg); }
+  .backup-content { padding: 4px 0 16px; }
   .recap-section summary {
     cursor: pointer;
     color: var(--sheikah-orange);
@@ -1639,6 +1656,8 @@
 
   <div id="crew-recap-section"></div>
 
+  <div id="crew-backup-section"></div>
+
   <div class="footnote">
     <b>Workflow:</b> 1) <b>René of Niels</b> klikt <b>👁 Zichtbaar voor Patrick</b> → opdracht verschijnt in zijn quest log. 2) Patrick uploadt bewijs. 3) <b>Iedere crew member</b> geeft een score (0–100). Het gemiddelde komt op de kaart. PIN crew: <b>2305</b> · PIN Patrick: <b>PATJE</b>.
   </div>
@@ -1825,6 +1844,20 @@ function getVoteCount(key) {
 }
 
 // --- Init Firebase ---
+// scoreComments live in their OWN document (bachelor/patrick_comments) so that
+// no setDoc/updateDoc on bachelor/patrick — including any old cached browser tab —
+// can ever wipe them.
+let mainScoreComments = {};     // legacy fallback from bachelor/patrick.scoreComments
+let dedicatedScoreComments = {}; // authoritative source from bachelor/patrick_comments
+let commentsDocLoaded = false;
+
+function recomputeScoreComments() {
+  // Prefer the dedicated doc once loaded; fall back to the legacy field on the main doc.
+  scoreComments = commentsDocLoaded && Object.keys(dedicatedScoreComments).length > 0
+    ? dedicatedScoreComments
+    : mainScoreComments;
+}
+
 try {
   const app = initializeApp(firebaseConfig);
   db = getFirestore(app);
@@ -1835,16 +1868,29 @@ try {
       uploads = d.uploads || {};
       released = d.released || {};
       scorePublished = d.scorePublished || {};
-      scoreComments = d.scoreComments || {};
+      mainScoreComments = d.scoreComments || {};
       goldOverrideUsed = d.goldOverrideUsed === true;
       patrickLogins = d.patrickLogins || [];
     } else {
-      scores = {}; uploads = {}; released = {}; scorePublished = {}; scoreComments = {}; goldOverrideUsed = false; patrickLogins = [];
+      scores = {}; uploads = {}; released = {}; scorePublished = {}; mainScoreComments = {}; goldOverrideUsed = false; patrickLogins = [];
     }
+    recomputeScoreComments();
     render();
   }, (err) => {
     console.error(err);
     showWarn('Fout bij verbinden met Firebase: ' + err.message);
+  });
+
+  // Separate listener for the comments-only document.
+  onSnapshot(doc(db, "bachelor", "patrick_comments"), (snap) => {
+    dedicatedScoreComments = snap.exists() ? (snap.data().scoreComments || {}) : {};
+    commentsDocLoaded = true;
+    recomputeScoreComments();
+    render();
+  }, (err) => {
+    console.error('[comments-doc]', err);
+    commentsDocLoaded = true;
+    recomputeScoreComments();
   });
 } catch (e) {
   showWarn('Firebase fout: ' + e.message);
@@ -1856,18 +1902,18 @@ function showWarn(msg) {
   w.textContent = '⚠️ ' + msg;
 }
 
-async function saveData(newScores, newUploads, newReleased, newOverride, newPublished, newComments) {
+async function saveData(newScores, newUploads, newReleased, newOverride, newPublished) {
   if (!db) return;
   try {
     // Build update payload with ONLY the fields actually changed.
     // updateDoc leaves all other fields untouched in Firestore.
+    // NOTE: scoreComments live in bachelor/patrick_comments — never touched here.
     const update = {};
     if (newScores !== undefined) update.scores = newScores;
     if (newUploads !== undefined) update.uploads = newUploads;
     if (newReleased !== undefined) update.released = newReleased;
     if (newOverride !== undefined) update.goldOverrideUsed = newOverride;
     if (newPublished !== undefined) update.scorePublished = newPublished;
-    if (newComments !== undefined) update.scoreComments = newComments;
     if (Object.keys(update).length === 0) return; // nothing to save
     await updateDoc(doc(db, "bachelor", "patrick"), update);
     setStatus('✓ Opgeslagen', 'ok');
@@ -1887,7 +1933,7 @@ async function togglePublished(key) {
   const newPublished = { ...scorePublished };
   newPublished[key] = !newPublished[key];
   scorePublished = newPublished;
-  await saveData(undefined, undefined, undefined, undefined, newPublished, undefined);
+  await saveData(undefined, undefined, undefined, undefined, newPublished);
 }
 
 async function useGoldOverride() {
@@ -1897,7 +1943,7 @@ async function useGoldOverride() {
     return;
   }
   goldOverrideUsed = !goldOverrideUsed;
-  await saveData(undefined, undefined, undefined, goldOverrideUsed, undefined, undefined);
+  await saveData(undefined, undefined, undefined, goldOverrideUsed, undefined);
 }
 
 // Calculate earned and max with multipliers + override
@@ -1928,7 +1974,7 @@ async function saveMyScore(key, value) {
   }
   scores = newScores;
   // Only pass scores - other fields stay untouched in Firestore via updateDoc
-  await saveData(newScores, undefined, undefined, undefined, undefined, undefined);
+  await saveData(newScores);
 }
 
 async function saveMyComment(key, text) {
@@ -1941,11 +1987,15 @@ async function saveMyComment(key, text) {
     return;
   }
   try {
-    // Read latest scoreComments from server (don't trust local state)
-    const snap = await getDoc(doc(db, "bachelor", "patrick"));
-    const existing = snap.exists() ? snap.data() : {};
-    const currentComments = existing.scoreComments || {};
-    const newComments = { ...currentComments };
+    // Read latest from the DEDICATED comments doc (immune to writes on bachelor/patrick)
+    const ref = doc(db, "bachelor", "patrick_comments");
+    const snap = await getDoc(ref);
+    const serverComments = (snap.exists() ? (snap.data().scoreComments || {}) : {});
+    // Merge with any legacy comments still on the main doc, so nothing is lost on first write.
+    const baseComments = (Object.keys(serverComments).length === 0)
+      ? { ...mainScoreComments }
+      : { ...serverComments };
+    const newComments = { ...baseComments };
     if (!newComments[key]) newComments[key] = {};
     else newComments[key] = { ...newComments[key] };
     if (text && text.trim()) {
@@ -1955,14 +2005,13 @@ async function saveMyComment(key, text) {
       if (Object.keys(newComments[key]).length === 0) delete newComments[key];
     }
     console.log('[saveMyComment] Saving:', { key, text, crewId: currentCrewId });
-    console.log('[saveMyComment] Existing from server:', currentComments);
     console.log('[saveMyComment] New to write:', newComments);
-    // updateDoc only touches the scoreComments field
-    await updateDoc(doc(db, "bachelor", "patrick"), {
-      scoreComments: newComments
-    });
-    scoreComments = newComments;
-    console.log('[saveMyComment] ✓ Successfully written to Firestore');
+    // setDoc with merge:true creates the doc if missing and only touches the field given.
+    await setDoc(ref, { scoreComments: newComments }, { merge: true });
+    dedicatedScoreComments = newComments;
+    commentsDocLoaded = true;
+    recomputeScoreComments();
+    console.log('[saveMyComment] ✓ Successfully written to bachelor/patrick_comments');
   } catch (e) {
     console.error('[saveMyComment] FAILED:', e);
     throw e;
@@ -1987,7 +2036,7 @@ async function toggleRelease(key) {
   const newReleased = { ...released };
   newReleased[key] = !newReleased[key];
   released = newReleased;
-  await saveData(undefined, undefined, newReleased, undefined, undefined, undefined);
+  await saveData(undefined, undefined, newReleased);
 }
 
 async function removeUpload(opdrachtKey, uploadIndex) {
@@ -1998,7 +2047,7 @@ async function removeUpload(opdrachtKey, uploadIndex) {
   newUploads[opdrachtKey].splice(uploadIndex, 1);
   if (newUploads[opdrachtKey].length === 0) delete newUploads[opdrachtKey];
   uploads = newUploads;
-  await saveData(undefined, newUploads, undefined, undefined, undefined, undefined);
+  await saveData(undefined, newUploads);
 }
 
 async function saveComment(opdrachtKey, text) {
@@ -2016,7 +2065,7 @@ async function saveComment(opdrachtKey, text) {
   }
   if (newUploads[opdrachtKey].length === 0) delete newUploads[opdrachtKey];
   uploads = newUploads;
-  await saveData(undefined, newUploads, undefined, undefined, undefined, undefined);
+  await saveData(undefined, newUploads);
 }
 
 async function uploadFile(file, opdrachtKey, progressEl) {
@@ -2049,7 +2098,7 @@ async function uploadFile(file, opdrachtKey, progressEl) {
           url: fileUrl, name: file.name, type: file.type, time: Date.now()
         });
         uploads = newUploads;
-        await saveData(undefined, newUploads, undefined, undefined, undefined, undefined);
+        await saveData(undefined, newUploads);
         resolve(fileUrl);
       } else {
         reject(new Error('Upload mislukt: ' + xhr.responseText));
@@ -2352,6 +2401,169 @@ function renderCrewPanel() {
   });
 
   renderCrewRecap();
+  renderCrewBackup();
+}
+
+function renderCrewBackup() {
+  const el = document.getElementById('crew-backup-section');
+  if (!el) return;
+  if (!ADMIN_IDS.includes(currentCrewId)) { el.innerHTML = ''; return; }
+  const inHourly = inHourlyBackupWindow();
+  const lastTs = lastBackupTs;
+  const lastTxt = lastTs ? new Date(lastTs).toLocaleString('nl-NL') : 'nog geen';
+  el.innerHTML = `
+    <details class="backup-section">
+      <summary>💾 Backups · laatste: ${lastTxt}</summary>
+      <div class="backup-content">
+        <p style="font-size:12px; opacity:0.85; margin: 6px 0 10px;">
+          Auto-backup naar Firestore: <b>${inHourly ? 'elk uur (22-25 mei)' : '1× per dag'}</b>.
+          Backups zijn aparte documenten en kunnen niet door andere acties overschreven worden.
+        </p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn-small" id="backup-download-btn">⬇️ Download nu (JSON)</button>
+          <button class="btn-small" id="backup-now-btn">☁️ Backup nu naar Firestore</button>
+          <button class="btn-small" id="backup-list-btn">📜 Toon backups</button>
+        </div>
+        <div id="backup-list" style="margin-top:10px;"></div>
+        <div id="backup-status" style="margin-top:8px; font-size:12px;"></div>
+      </div>
+    </details>`;
+  document.getElementById('backup-download-btn').addEventListener('click', downloadBackupAsFile);
+  document.getElementById('backup-now-btn').addEventListener('click', async () => {
+    setBackupStatus('Backup wordt gemaakt…');
+    try { await createBackupDoc('manual'); setBackupStatus('✓ Backup opgeslagen', 'ok'); }
+    catch (e) { setBackupStatus('✗ ' + e.message, 'err'); }
+  });
+  document.getElementById('backup-list-btn').addEventListener('click', loadBackupList);
+}
+
+function setBackupStatus(msg, kind) {
+  const s = document.getElementById('backup-status');
+  if (!s) return;
+  s.textContent = msg;
+  s.style.color = kind === 'ok' ? '#a6e22e' : kind === 'err' ? '#ff6464' : 'inherit';
+  if (msg) setTimeout(() => { if (s.textContent === msg) s.textContent = ''; }, 5000);
+}
+
+function buildBackupPayload() {
+  return {
+    backedUpAt: Date.now(),
+    backedUpBy: currentCrewId || 'unknown',
+    scores, uploads, released, scorePublished,
+    scoreComments,
+    goldOverrideUsed,
+    patrickLogins
+  };
+}
+
+function downloadBackupAsFile() {
+  const payload = buildBackupPayload();
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  a.href = url;
+  a.download = `patrick-backup-${stamp}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  setBackupStatus('✓ Bestand gedownload', 'ok');
+}
+
+// Auto-backup logic
+let lastBackupTs = 0;
+let autoBackupChecked = false;
+
+function inHourlyBackupWindow() {
+  // 22 mei 2026 00:00 .. 25 mei 2026 23:59 (local time approx; use date-only)
+  const now = new Date();
+  const y = now.getFullYear();
+  if (y !== 2026) return false;
+  const m = now.getMonth() + 1;
+  if (m !== 5) return false;
+  const d = now.getDate();
+  return d >= 22 && d <= 25;
+}
+
+function backupIntervalMs() {
+  return inHourlyBackupWindow() ? (60 * 60 * 1000) : (24 * 60 * 60 * 1000);
+}
+
+async function maybeAutoBackup() {
+  if (!db) return;
+  if (autoBackupChecked) return;
+  autoBackupChecked = true;
+  if (!ADMIN_IDS.includes(currentCrewId)) return;
+  try {
+    const idxRef = doc(db, "bachelor", "_backup_index");
+    const snap = await getDoc(idxRef);
+    const lastTs = snap.exists() ? (snap.data().lastBackupTs || 0) : 0;
+    lastBackupTs = lastTs;
+    const interval = backupIntervalMs();
+    if (Date.now() - lastTs >= interval) {
+      await createBackupDoc('auto');
+    }
+    renderCrewBackup();
+  } catch (e) {
+    console.error('[autobackup]', e);
+  }
+}
+
+async function createBackupDoc(reason) {
+  if (!db) throw new Error('Firebase niet beschikbaar');
+  const payload = { ...buildBackupPayload(), reason: reason || 'manual' };
+  const ts = payload.backedUpAt;
+  const stamp = new Date(ts).toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const docId = `backup_${stamp}`;
+  await setDoc(doc(db, "bachelor", docId), payload);
+  // update index doc
+  const idxRef = doc(db, "bachelor", "_backup_index");
+  const idxSnap = await getDoc(idxRef);
+  const list = idxSnap.exists() ? (idxSnap.data().backups || []) : [];
+  list.push({ id: docId, ts, reason: payload.reason, by: payload.backedUpBy });
+  // keep last 200 entries in index
+  const trimmed = list.slice(-200);
+  await setDoc(idxRef, { lastBackupTs: ts, backups: trimmed }, { merge: true });
+  lastBackupTs = ts;
+}
+
+async function loadBackupList() {
+  if (!db) return;
+  const wrap = document.getElementById('backup-list');
+  if (!wrap) return;
+  wrap.innerHTML = '<div style="opacity:0.7;">Laden…</div>';
+  try {
+    const idxSnap = await getDoc(doc(db, "bachelor", "_backup_index"));
+    const list = idxSnap.exists() ? (idxSnap.data().backups || []) : [];
+    if (list.length === 0) { wrap.innerHTML = '<div style="opacity:0.7;">Nog geen backups.</div>'; return; }
+    const recent = list.slice(-30).reverse();
+    wrap.innerHTML = `<div style="font-size:12px; opacity:0.85; margin-bottom:6px;">Laatste ${recent.length} backups (van ${list.length} totaal):</div>` +
+      recent.map(b => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 8px; border-bottom:1px solid rgba(255,255,255,0.08); font-size:12px;">
+          <span>${new Date(b.ts).toLocaleString('nl-NL')} · ${b.reason} · ${b.by}</span>
+          <button class="btn-small backup-dl" data-id="${b.id}" style="padding:2px 8px;">⬇️</button>
+        </div>`).join('');
+    wrap.querySelectorAll('.backup-dl').forEach(btn => {
+      btn.addEventListener('click', () => downloadStoredBackup(btn.dataset.id));
+    });
+  } catch (e) {
+    wrap.innerHTML = '<div style="color:#ff6464;">Fout: ' + e.message + '</div>';
+  }
+}
+
+async function downloadStoredBackup(docId) {
+  try {
+    const snap = await getDoc(doc(db, "bachelor", docId));
+    if (!snap.exists()) { setBackupStatus('Backup niet gevonden', 'err'); return; }
+    const blob = new Blob([JSON.stringify(snap.data(), null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${docId}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    setBackupStatus('✓ Gedownload', 'ok');
+  } catch (e) {
+    setBackupStatus('✗ ' + e.message, 'err');
+  }
 }
 
 function renderCrewRecap() {
@@ -3045,6 +3257,7 @@ function enterCrewMode() {
   document.getElementById('login-panel').style.display = 'none';
   document.getElementById('crew-panel').style.display = 'block';
   document.getElementById('patrick-panel').style.display = 'none';
+  maybeAutoBackup();
   const member = CREW_MEMBERS.find(m => m.id === currentCrewId);
   document.getElementById('crew-identity').innerHTML = `Ingelogd als <b>${member ? member.name : '?'}</b> · <a href="#" id="switch-user" style="color:var(--gold); text-decoration:underline;">wissel</a>`;
   document.getElementById('switch-user').addEventListener('click', (e) => {
