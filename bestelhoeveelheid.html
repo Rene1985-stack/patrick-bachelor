@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BT — Bestelhoeveelheid · Flowchart</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #f6f7fb;
+    --bg-card: #ffffff;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --text-faint: #94a3b8;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+
+    --inputs-bg: #eff6ff;
+    --inputs-accent: #2563eb;
+    --inputs-text: #1e3a8a;
+
+    --derived-bg: #f5f3ff;
+    --derived-accent: #7c3aed;
+    --derived-text: #4c1d95;
+
+    --decision-bg: #fffbeb;
+    --decision-accent: #d97706;
+    --decision-text: #78350f;
+
+    --result-bg: #ecfdf5;
+    --result-accent: #059669;
+    --result-text: #064e3b;
+
+    --danger-bg: #fee2e2;
+    --danger-accent: #dc2626;
+    --danger-text: #7f1d1d;
+
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 6px rgba(15, 23, 42, 0.04), 0 10px 20px rgba(15, 23, 42, 0.06);
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background:
+      radial-gradient(circle at 10% 0%, #dbeafe 0%, transparent 40%),
+      radial-gradient(circle at 90% 20%, #ede9fe 0%, transparent 40%),
+      radial-gradient(circle at 50% 100%, #d1fae5 0%, transparent 50%),
+      var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    padding: 48px 20px 64px;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 1180px; margin: 0 auto; }
+
+  /* ───────────── HEADER ───────────── */
+  header { text-align: center; margin-bottom: 48px; }
+  .badge-top {
+    display: inline-block;
+    padding: 6px 14px;
+    background: rgba(15, 23, 42, 0.06);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 18px;
+  }
+  header h1 {
+    font-size: 44px; font-weight: 800; letter-spacing: -0.03em;
+    line-height: 1.1; margin-bottom: 8px;
+  }
+  header h1 .gradient {
+    background: linear-gradient(135deg, var(--inputs-accent), var(--derived-accent), var(--result-accent));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  header .subtitle {
+    color: var(--text-muted); font-size: 17px; font-weight: 400;
+    max-width: 580px; margin: 0 auto;
+  }
+  .sku-pill {
+    display: inline-flex; align-items: center; gap: 10px;
+    margin-top: 22px; padding: 8px 8px 8px 16px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 100px; box-shadow: var(--shadow-sm);
+  }
+  .sku-pill .sku-code {
+    font-family: 'JetBrains Mono', monospace; font-weight: 700;
+    font-size: 13px; color: var(--text);
+  }
+  .sku-pill .sku-name {
+    padding: 4px 12px; background: #0f172a; color: white;
+    border-radius: 100px; font-size: 12px; font-weight: 500;
+  }
+
+  /* ───────────── STEP CARDS ───────────── */
+  .step {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 28px 28px 32px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    position: relative;
+  }
+  .step + .step { margin-top: 0; }
+
+  .step-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 22px;
+  }
+  .step-number {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px; color: white;
+    flex-shrink: 0;
+  }
+  .step-title {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .step-name { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+
+  .step.inputs { border-top: 4px solid var(--inputs-accent); }
+  .step.inputs .step-number { background: var(--inputs-accent); }
+  .step.derived { border-top: 4px solid var(--derived-accent); }
+  .step.derived .step-number { background: var(--derived-accent); }
+  .step.decision { border-top: 4px solid var(--decision-accent); }
+  .step.decision .step-number { background: var(--decision-accent); }
+  .step.result { border-top: 4px solid var(--result-accent); }
+  .step.result .step-number { background: var(--result-accent); }
+
+  /* ───────────── ARROWS BETWEEN STEPS ───────────── */
+  .arrow {
+    height: 56px;
+    display: flex; justify-content: center; align-items: center;
+    position: relative;
+  }
+  .arrow svg { display: block; }
+
+  /* ───────────── STAP 1: INPUTS ───────────── */
+  .input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .input-card {
+    background: var(--inputs-bg);
+    border: 1px solid #bfdbfe;
+    border-left: 4px solid var(--inputs-accent);
+    border-radius: 12px;
+    padding: 16px 18px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .input-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  .input-card h3 {
+    font-size: 11px; font-weight: 700;
+    color: var(--inputs-text); margin-bottom: 12px;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .input-card h3::before {
+    content: ''; width: 6px; height: 6px;
+    background: var(--inputs-accent); border-radius: 50%;
+  }
+  .input-card ul { list-style: none; }
+  .input-card li {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 6px 0; font-size: 13px;
+    border-bottom: 1px dashed rgba(37, 99, 235, 0.15);
+  }
+  .input-card li:last-child { border-bottom: none; }
+  .input-card .field {
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  }
+  .input-card .value {
+    font-weight: 700; color: var(--inputs-text);
+    font-family: 'JetBrains Mono', monospace; font-size: 14px;
+  }
+  .input-card.killswitch {
+    background: var(--danger-bg); border-color: #fecaca;
+    border-left-color: var(--danger-accent);
+  }
+  .input-card.killswitch h3 { color: var(--danger-text); }
+  .input-card.killswitch h3::before { background: var(--danger-accent); }
+  .input-card.killswitch .field { color: var(--danger-text); opacity: 0.7; }
+  .input-card.killswitch .value { color: var(--danger-text); }
+
+  /* ───────────── STAP 2: DERIVED ───────────── */
+  .derived-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .calc-card {
+    background: white; border-radius: 14px; padding: 18px;
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--derived-accent);
+    position: relative;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .calc-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  .calc-card.target {
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    border: 2px solid var(--derived-accent);
+  }
+  .calc-card.target::after {
+    content: '★ TARGET';
+    position: absolute; top: 10px; right: 10px;
+    font-size: 9px; font-weight: 800;
+    background: var(--derived-accent); color: white;
+    padding: 3px 8px; border-radius: 100px;
+    letter-spacing: 0.08em;
+  }
+  .calc-card .symbol {
+    display: inline-block; padding: 3px 10px;
+    background: var(--derived-bg); color: var(--derived-text);
+    border: 1px solid #ddd6fe;
+    border-radius: 6px; font-weight: 800;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  }
+  .calc-card .name {
+    font-size: 14px; font-weight: 600; color: var(--text);
+    margin-top: 8px;
+  }
+  .calc-card .formula {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-muted); margin: 10px 0;
+    background: rgba(124, 58, 237, 0.06); padding: 8px 10px;
+    border-radius: 6px; border-left: 2px solid var(--derived-accent);
+  }
+  .calc-card .result-value {
+    font-size: 36px; font-weight: 800;
+    color: var(--derived-text);
+    font-variant-numeric: tabular-nums; line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .calc-card .unit {
+    font-size: 13px; color: var(--text-muted);
+    font-weight: 500; margin-left: 4px;
+  }
+
+  /* ───────────── STAP 3: DECISION TREE ───────────── */
+  .decision-tree {
+    display: flex; flex-direction: column;
+    align-items: stretch; gap: 0;
+    max-width: 820px; margin: 0 auto;
+  }
+  .decision-node {
+    background: white; border-radius: 14px; padding: 18px 20px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 18px;
+    align-items: center;
+  }
+  .decision-diamond {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, var(--decision-accent), #f59e0b);
+    color: white; border-radius: 8px;
+    transform: rotate(45deg);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+  }
+  .decision-diamond span {
+    transform: rotate(-45deg); font-weight: 800; font-size: 18px;
+  }
+  .decision-content { min-width: 0; }
+  .decision-question {
+    font-weight: 700; font-size: 16px; color: var(--text);
+    margin-bottom: 4px;
+  }
+  .decision-eval {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    color: var(--text-muted);
+  }
+  .decision-eval .live-no { color: var(--result-accent); font-weight: 700; }
+  .decision-eval .live-yes { color: var(--danger-accent); font-weight: 700; }
+
+  .decision-branches { display: flex; flex-direction: column; gap: 6px; }
+  .branch {
+    padding: 6px 12px; border-radius: 6px; font-weight: 600;
+    font-size: 12px; white-space: nowrap;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .branch.stop { background: var(--danger-bg); color: var(--danger-accent); }
+  .branch.stop::before { content: '✗ '; }
+  .branch.continue { background: var(--result-bg); color: var(--result-accent); }
+  .branch.continue::before { content: '↓ '; }
+  .branch.muted { opacity: 0.4; }
+
+  .decision-connector {
+    width: 2px; height: 16px; background: var(--border-strong);
+    margin: 0 auto;
+  }
+
+  .decision-result-box {
+    background: linear-gradient(135deg, var(--result-bg) 0%, #d1fae5 100%);
+    border: 2px solid var(--result-accent); border-radius: 14px;
+    padding: 22px; margin-top: 8px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(5, 150, 105, 0.15);
+  }
+  .decision-result-box .label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--result-accent); margin-bottom: 6px;
+  }
+  .decision-result-box .formula {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600; color: var(--result-text);
+    font-size: 14px; margin-bottom: 8px;
+  }
+  .decision-result-box .live {
+    font-size: 36px; font-weight: 800; color: var(--result-accent);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ───────────── STAP 4: FINAL RESULT ───────────── */
+  .result-cards {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+    max-width: 820px; margin: 0 auto;
+  }
+  .result-card {
+    background: white; border-radius: 16px; padding: 24px;
+    border: 2px solid var(--result-accent);
+    text-align: center;
+    position: relative; overflow: hidden;
+    box-shadow: 0 8px 24px rgba(5, 150, 105, 0.1);
+  }
+  .result-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 4px; background: linear-gradient(90deg, var(--result-accent), #34d399);
+  }
+  .result-card .symbol {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800; color: var(--result-accent); font-size: 14px;
+    letter-spacing: 0.05em;
+  }
+  .result-card .name {
+    color: var(--text); font-size: 14px; margin: 4px 0 14px;
+    font-weight: 500;
+  }
+  .result-card .value {
+    font-size: 60px; font-weight: 800; color: var(--result-text);
+    font-variant-numeric: tabular-nums; line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .result-card .description {
+    color: var(--text-muted); font-size: 12px; margin-top: 10px;
+  }
+  .result-card.bu { border-color: #ca8a04; }
+  .result-card.bu::before { background: linear-gradient(90deg, #ca8a04, #fbbf24); }
+  .result-card.bu .symbol, .result-card.bu .value { color: #854d0e; }
+
+  /* ───────────── FORMULA BOX ───────────── */
+  .formula-box {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: white; border-radius: 16px; padding: 28px;
+    margin-top: 32px; border: 1px solid #334155;
+    box-shadow: var(--shadow-md);
+  }
+  .formula-box h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: #94a3b8; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .formula-box h3::before {
+    content: ''; width: 6px; height: 6px;
+    background: #fbbf24; border-radius: 50%;
+  }
+  .formula-box pre {
+    white-space: pre-wrap; font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; line-height: 1.8; color: #e2e8f0;
+    overflow-x: auto;
+  }
+  .formula-box .kw { color: #fbbf24; font-weight: 700; }
+  .formula-box .op { color: #f472b6; }
+  .formula-box .var { color: #60a5fa; }
+  .formula-box .comment { color: #64748b; font-style: italic; }
+
+  /* ───────────── LEGEND / FOOTER ───────────── */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    justify-content: center; margin-top: 24px;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 10px; background: var(--bg-card);
+    border: 1px solid var(--border); border-radius: 100px;
+  }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  @media (max-width: 720px) {
+    body { padding: 32px 14px 48px; }
+    header h1 { font-size: 32px; }
+    .step { padding: 22px 18px; }
+    .result-cards { grid-template-columns: 1fr; }
+    .decision-node {
+      grid-template-columns: auto 1fr;
+    }
+    .decision-branches { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; }
+    .result-card .value { font-size: 48px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <span class="badge-top">Live voorbeeld · Sales Forecast</span>
+    <h1>BT — <span class="gradient">Bestelhoeveelheid</span></h1>
+    <p class="subtitle">Van bron-data tot eindgetal in 4 stappen. Wijzig de SKU in B3 om een andere rij te bekijken.</p>
+    <div class="sku-pill">
+      <span class="sku-code">SAVS-BD-1218</span>
+      <span class="sku-name">Lanxi Joen · SAVS® Blusdeken 1,2 × 1,8 m</span>
+    </div>
+  </header>
+
+  <!-- STAP 1: INPUTS -->
+  <section class="step inputs">
+    <div class="step-header">
+      <div class="step-number">1</div>
+      <div>
+        <div class="step-title">Stap 1</div>
+        <div class="step-name">Inputs uit bron-tabs</div>
+      </div>
+    </div>
+    <div class="input-grid">
+      <div class="input-card">
+        <h3>Voorraad-staat</h3>
+        <ul>
+          <li><span class="field">BL · Op Voorraad</span><span class="value">385</span></li>
+          <li><span class="field">BM · Transit Air</span><span class="value">—</span></li>
+          <li><span class="field">BN · Transit Sea</span><span class="value">750</span></li>
+          <li><span class="field">BO · In Productie</span><span class="value">—</span></li>
+          <li><span class="field">BP · Planning uit</span><span class="value">−90</span></li>
+        </ul>
+      </div>
+      <div class="input-card">
+        <h3>Vraag &amp; Levertijd</h3>
+        <ul>
+          <li><span class="field">BI · Demand/mnd</span><span class="value">300</span></li>
+          <li><span class="field">BS · Levertijd</span><span class="value">101 dgn</span></li>
+        </ul>
+      </div>
+      <div class="input-card">
+        <h3>Veiligheidsbuffers</h3>
+        <ul>
+          <li><span class="field">Buffer-weken</span><span class="value">4,0 wkn</span></li>
+          <li><span class="field">Buffer-maanden</span><span class="value">1,0 mnd</span></li>
+        </ul>
+      </div>
+      <div class="input-card killswitch">
+        <h3>Killswitch</h3>
+        <ul>
+          <li><span class="field">BB · EOL?</span><span class="value">Nee</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="arrow">
+    <svg width="24" height="56" viewBox="0 0 24 56" fill="none">
+      <line x1="12" y1="0" x2="12" y2="44" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 4"/>
+      <path d="M5 42 L12 52 L19 42" stroke="#94a3b8" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- STAP 2: DERIVED -->
+  <section class="step derived">
+    <div class="step-header">
+      <div class="step-number">2</div>
+      <div>
+        <div class="step-title">Stap 2</div>
+        <div class="step-name">Afgeleide waarden</div>
+      </div>
+    </div>
+    <div class="derived-grid">
+      <div class="calc-card">
+        <span class="symbol">BQ</span>
+        <div class="name">Totaal Beschikbaar</div>
+        <div class="formula">BL + BM + BN + BO − BP</div>
+        <div class="result-value">1.045<span class="unit">stuks</span></div>
+      </div>
+      <div class="calc-card">
+        <span class="symbol">CD</span>
+        <div class="name">Voorraad lead time</div>
+        <div class="formula">ROUND(BS/7) × (BI/4,33)</div>
+        <div class="result-value">970<span class="unit">stuks</span></div>
+      </div>
+      <div class="calc-card">
+        <span class="symbol">CE</span>
+        <div class="name">Buffer voorraad</div>
+        <div class="formula">buf_wkn×(BI/4,33) + buf_mnd×BI</div>
+        <div class="result-value">577<span class="unit">stuks</span></div>
+      </div>
+      <div class="calc-card target">
+        <span class="symbol">CF</span>
+        <div class="name">Re-order point</div>
+        <div class="formula">CD + CE</div>
+        <div class="result-value">1.547<span class="unit">stuks</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="arrow">
+    <svg width="24" height="56" viewBox="0 0 24 56" fill="none">
+      <line x1="12" y1="0" x2="12" y2="44" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 4"/>
+      <path d="M5 42 L12 52 L19 42" stroke="#94a3b8" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- STAP 3: DECISION TREE -->
+  <section class="step decision">
+    <div class="step-header">
+      <div class="step-number">3</div>
+      <div>
+        <div class="step-title">Stap 3</div>
+        <div class="step-name">Beslissingsboom</div>
+      </div>
+    </div>
+    <div class="decision-tree">
+
+      <div class="decision-node">
+        <div class="decision-diamond"><span>?</span></div>
+        <div class="decision-content">
+          <div class="decision-question">Is dit artikel End-of-Life?</div>
+          <div class="decision-eval">EOL = "Ja"  →  live: <span class="live-no">nee</span></div>
+        </div>
+        <div class="decision-branches">
+          <div class="branch stop muted">Ja → BT = 0</div>
+          <div class="branch continue">Nee → ga door</div>
+        </div>
+      </div>
+
+      <div class="decision-connector"></div>
+
+      <div class="decision-node">
+        <div class="decision-diamond"><span>?</span></div>
+        <div class="decision-content">
+          <div class="decision-question">Is voorraad voldoende?</div>
+          <div class="decision-eval">BQ &gt; CF  →  1.045 &gt; 1.547  →  <span class="live-no">nee</span></div>
+        </div>
+        <div class="decision-branches">
+          <div class="branch stop muted">Ja → BT = 0</div>
+          <div class="branch continue">Nee → bestellen</div>
+        </div>
+      </div>
+
+      <div class="decision-connector"></div>
+
+      <div class="decision-result-box">
+        <div class="label">★ Tekort berekenen</div>
+        <div class="formula">BT = CF − BQ = 1.547 − 1.045</div>
+        <div class="live">= 502</div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="arrow">
+    <svg width="24" height="56" viewBox="0 0 24 56" fill="none">
+      <line x1="12" y1="0" x2="12" y2="44" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 4"/>
+      <path d="M5 42 L12 52 L19 42" stroke="#94a3b8" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- STAP 4: FINAL RESULT -->
+  <section class="step result">
+    <div class="step-header">
+      <div class="step-number">4</div>
+      <div>
+        <div class="step-title">Stap 4</div>
+        <div class="step-name">Eindresultaat</div>
+      </div>
+    </div>
+    <div class="result-cards">
+      <div class="result-card bt">
+        <div class="symbol">BT</div>
+        <div class="name">Bestelhoeveelheid</div>
+        <div class="value">502</div>
+        <div class="description">Rechtstreeks uit Sales Forecast kolom BT</div>
+      </div>
+      <div class="result-card bu">
+        <div class="symbol">BU</div>
+        <div class="name">Te bestellen (afgerond)</div>
+        <div class="value">520</div>
+        <div class="description">Afgerond op karton/pallet · +30% tolerantie</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VOLLEDIGE FORMULE -->
+  <div class="formula-box">
+    <h3>Volledige formule-keten</h3>
+<pre><span class="kw">BT</span> <span class="op">=</span> <span class="kw">IF</span>(EOL <span class="op">=</span> <span class="var">"Ja"</span>, <span class="var">0</span>,
+        <span class="kw">IF</span>(BQ <span class="op">&gt;</span> CF, <span class="var">0</span>,
+           CF <span class="op">−</span> BQ))
+
+   <span class="op">=</span> (CD <span class="op">+</span> CE) <span class="op">−</span> (BL <span class="op">+</span> BM <span class="op">+</span> BN <span class="op">+</span> BO <span class="op">−</span> BP)
+   <span class="op">=</span> (leadtime-voorraad <span class="op">+</span> buffer) <span class="op">−</span> (totaal beschikbaar)
+
+<span class="comment">// Waarbij:</span>
+   CD <span class="op">=</span> <span class="kw">ROUND</span>(BS<span class="op">/</span>7, 0) <span class="op">×</span> (BI <span class="op">/</span> 4,33)
+   CE <span class="op">=</span> buffer_wkn <span class="op">×</span> (BI<span class="op">/</span>4,33) <span class="op">+</span> buffer_mnd <span class="op">×</span> BI</pre>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background: var(--inputs-accent);"></span>Inputs (bron-data)</div>
+    <div class="legend-item"><span class="legend-dot" style="background: var(--derived-accent);"></span>Afgeleide berekeningen</div>
+    <div class="legend-item"><span class="legend-dot" style="background: var(--decision-accent);"></span>Beslissingen</div>
+    <div class="legend-item"><span class="legend-dot" style="background: var(--result-accent);"></span>Eindresultaat</div>
+    <div class="legend-item"><span class="legend-dot" style="background: var(--danger-accent);"></span>Killswitch / stop</div>
+  </div>
+
+</div>
+</body>
+</html>
